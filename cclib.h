@@ -13,9 +13,11 @@
 #include <cassert>
 #include <cmath>
 
-#if defined(_MSC_VER) && _MSC_VER <= 3000
- // MS compiler doesn't like most of the following as constexpr
- #define constexpr
+// MS compiler does not like constexpr spec with common math functions (abs, tan, ...)
+#if defined(_MSC_VER)
+ #define MSC_MATH_CONSTEXPR 
+#else
+ #define MSC_MATH_CONSTEXPR constexpr
 #endif
 
 namespace cc
@@ -63,7 +65,7 @@ namespace math
 
 
     // cotangent
-    constexpr inline float cot(float x) { return cosf(x) / sinf(x); }
+    MSC_MATH_CONSTEXPR inline float cot(float x) { return cosf(x) / sinf(x); }
 
 
     //
@@ -165,70 +167,70 @@ namespace math
     //
     // operators
     //
-    inline constexpr vec2 operator+(const vec2& a, float b)         { return vec2{ a.x + b, a.y + b }; }
-    inline constexpr vec2 operator+(float b, const vec2& a)         { return vec2{ a.x + b, a.y + b }; }
-    inline constexpr vec2 operator+(const vec2& a, const vec2& b)   { return vec2{ a.x + b.x, a.y + b.y }; }
-    inline constexpr vec2 operator-(const vec2& a, float b)         { return vec2{ a.x - b, a.y - b }; }
-    inline constexpr vec2 operator-(float b, const vec2& a)         { return vec2{ a.x - b, a.y - b }; }
-    inline constexpr vec2 operator-(const vec2& a, const vec2& b)   { return vec2{ a.x - b.x, a.y - b.y }; }
-    inline constexpr vec2 operator*(const vec2& a, float b)         { return vec2{ a.x * b, a.y * b }; }
-    inline constexpr vec2 operator*(float b, const vec2& a)         { return vec2{ a.x * b, a.y * b }; }
-    inline constexpr vec2 operator*(const vec2& a, const vec2& b)   { return vec2{ a.x * b.x, a.y * b.y }; }
-    inline constexpr vec2 operator/(const vec2& a, float b)         { return vec2{ a.x / b, a.y / b }; }
-    inline constexpr vec2 operator/(float b, const vec2& a)         { return vec2{ a.x / b, a.y / b }; }
-    inline constexpr vec2 operator/(const vec2& a, const vec2& b)   { return vec2{ a.x / b.x, a.y / b.y }; }
-    inline constexpr vec2& operator+=(vec2& a, float b)             { a.x += b; a.y += b; return a; }
-    inline constexpr vec2& operator-=(vec2& a, float b)             { a.x -= b; a.y -= b; return a; }
-    inline constexpr vec2& operator*=(vec2& a, float b)             { a.x *= b; a.y *= b; return a; }
-    inline constexpr vec2& operator/=(vec2& a, float b)             { a.x /= b; a.y /= b; return a; }
-    inline constexpr bool operator==(const vec2& a, const vec2& b)  { return fabsf(a.x - b.x) < EPS && fabsf(a.y - b.y) < EPS; }
-    inline constexpr bool operator!=(const vec2& a, const vec2& b)  { return !(a == b); }
+    inline constexpr vec2 operator+(const vec2& a, float b)                  { return vec2{ a.x + b, a.y + b }; }
+    inline constexpr vec2 operator+(float b, const vec2& a)                  { return vec2{ a.x + b, a.y + b }; }
+    inline constexpr vec2 operator+(const vec2& a, const vec2& b)            { return vec2{ a.x + b.x, a.y + b.y }; }
+    inline constexpr vec2 operator-(const vec2& a, float b)                  { return vec2{ a.x - b, a.y - b }; }
+    inline constexpr vec2 operator-(float b, const vec2& a)                  { return vec2{ a.x - b, a.y - b }; }
+    inline constexpr vec2 operator-(const vec2& a, const vec2& b)            { return vec2{ a.x - b.x, a.y - b.y }; }
+    inline constexpr vec2 operator*(const vec2& a, float b)                  { return vec2{ a.x * b, a.y * b }; }
+    inline constexpr vec2 operator*(float b, const vec2& a)                  { return vec2{ a.x * b, a.y * b }; }
+    inline constexpr vec2 operator*(const vec2& a, const vec2& b)            { return vec2{ a.x * b.x, a.y * b.y }; }
+    inline constexpr vec2 operator/(const vec2& a, float b)                  { return vec2{ a.x / b, a.y / b }; }
+    inline constexpr vec2 operator/(float b, const vec2& a)                  { return vec2{ a.x / b, a.y / b }; }
+    inline constexpr vec2 operator/(const vec2& a, const vec2& b)            { return vec2{ a.x / b.x, a.y / b.y }; }
+    inline constexpr vec2& operator+=(vec2& a, float b)                      { a.x += b; a.y += b; return a; }
+    inline constexpr vec2& operator-=(vec2& a, float b)                      { a.x -= b; a.y -= b; return a; }
+    inline constexpr vec2& operator*=(vec2& a, float b)                      { a.x *= b; a.y *= b; return a; }
+    inline constexpr vec2& operator/=(vec2& a, float b)                      { a.x /= b; a.y /= b; return a; }
+    inline MSC_MATH_CONSTEXPR bool operator==(const vec2& a, const vec2& b)  { return fabsf(a.x - b.x) < EPS && fabsf(a.y - b.y) < EPS; }
+    inline MSC_MATH_CONSTEXPR bool operator!=(const vec2& a, const vec2& b)  { return !(a == b); }
 
-    inline constexpr vec3 operator+(const vec3& a, float b)         { return vec3{ a.x + b, a.y + b, a.z + b }; }
-    inline constexpr vec3 operator+(float b, const vec3& a)         { return vec3{ a.x + b, a.y + b, a.z + b }; }
-    inline constexpr vec3 operator+(const vec3& a, const vec3& b)   { return vec3{ a.x + b.x, a.y + b.y, a.z + b.z }; }
-    inline constexpr vec3 operator-(const vec3& a, float b)         { return vec3{ a.x - b, a.y - b, a.z - b }; }
-    inline constexpr vec3 operator-(float b, const vec3& a)         { return vec3{ a.x - b, a.y - b, a.z - b }; }
-    inline constexpr vec3 operator-(const vec3& a, const vec3& b)   { return vec3{ a.x - b.x, a.y - b.y, a.z - b.z }; }
-    inline constexpr vec3 operator*(const vec3& a, float b)         { return vec3{ a.x * b, a.y * b, a.z * b }; }
-    inline constexpr vec3 operator*(float b, const vec3& a)         { return vec3{ a.x * b, a.y * b, a.z * b }; }
-    inline constexpr vec3 operator*(const vec3& a, const vec3& b)   { return vec3{ a.x * b.x, a.y * b.y, a.z * b.z }; }
-    inline constexpr vec3 operator/(const vec3& a, float b)         { return vec3{ a.x / b, a.y / b, a.z / b }; }
-    inline constexpr vec3 operator/(float b, const vec3& a)         { return vec3{ a.x / b, a.y / b, a.z / b }; }
-    inline constexpr vec3 operator/(const vec3& a, const vec3& b)   { return vec3{ a.x / b.x, a.y / b.y, a.z / b.z }; }
-    inline constexpr vec3& operator+=(vec3& a, const vec3& b)       { a.x += b.x; a.y += b.y; a.z += b.z; return a; }
-    inline constexpr vec3& operator-=(vec3& a, const vec3& b)       { a.x -= b.x; a.y -= b.y; a.z -= b.z; return a; }
-    inline constexpr vec3& operator*=(vec3& a, const vec3& b)       { a.x *= b.x; a.y *= b.y; a.z *= b.z; return a; }
-    inline constexpr vec3& operator/=(vec3& a, const vec3& b)       { a.x /= b.x; a.y /= b.y; a.z /= b.z; return a; }
-    inline constexpr vec3& operator+=(vec3& a, float b)             { a.x += b; a.y += b; a.z += b; return a; }
-    inline constexpr vec3& operator-=(vec3& a, float b)             { a.x -= b; a.y -= b; a.z -= b; return a; }
-    inline constexpr vec3& operator*=(vec3& a, float b)             { a.x *= b; a.y *= b; a.z *= b; return a; }
-    inline constexpr vec3& operator/=(vec3& a, float b)             { a.x /= b; a.y /= b; a.z /= b; return a; }
-    inline constexpr bool operator==(const vec3& a, const vec3& b)  { return fabsf(a.x - b.x) < EPS && fabsf(a.y - b.y) < EPS && fabsf(a.z - b.z) < EPS; }
-    inline constexpr bool operator!=(const vec3& a, const vec3& b)  { return !(a == b); }
+    inline constexpr vec3 operator+(const vec3& a, float b)                  { return vec3{ a.x + b, a.y + b, a.z + b }; }
+    inline constexpr vec3 operator+(float b, const vec3& a)                  { return vec3{ a.x + b, a.y + b, a.z + b }; }
+    inline constexpr vec3 operator+(const vec3& a, const vec3& b)            { return vec3{ a.x + b.x, a.y + b.y, a.z + b.z }; }
+    inline constexpr vec3 operator-(const vec3& a, float b)                  { return vec3{ a.x - b, a.y - b, a.z - b }; }
+    inline constexpr vec3 operator-(float b, const vec3& a)                  { return vec3{ a.x - b, a.y - b, a.z - b }; }
+    inline constexpr vec3 operator-(const vec3& a, const vec3& b)            { return vec3{ a.x - b.x, a.y - b.y, a.z - b.z }; }
+    inline constexpr vec3 operator*(const vec3& a, float b)                  { return vec3{ a.x * b, a.y * b, a.z * b }; }
+    inline constexpr vec3 operator*(float b, const vec3& a)                  { return vec3{ a.x * b, a.y * b, a.z * b }; }
+    inline constexpr vec3 operator*(const vec3& a, const vec3& b)            { return vec3{ a.x * b.x, a.y * b.y, a.z * b.z }; }
+    inline constexpr vec3 operator/(const vec3& a, float b)                  { return vec3{ a.x / b, a.y / b, a.z / b }; }
+    inline constexpr vec3 operator/(float b, const vec3& a)                  { return vec3{ a.x / b, a.y / b, a.z / b }; }
+    inline constexpr vec3 operator/(const vec3& a, const vec3& b)            { return vec3{ a.x / b.x, a.y / b.y, a.z / b.z }; }
+    inline constexpr vec3& operator+=(vec3& a, const vec3& b)                { a.x += b.x; a.y += b.y; a.z += b.z; return a; }
+    inline constexpr vec3& operator-=(vec3& a, const vec3& b)                { a.x -= b.x; a.y -= b.y; a.z -= b.z; return a; }
+    inline constexpr vec3& operator*=(vec3& a, const vec3& b)                { a.x *= b.x; a.y *= b.y; a.z *= b.z; return a; }
+    inline constexpr vec3& operator/=(vec3& a, const vec3& b)                { a.x /= b.x; a.y /= b.y; a.z /= b.z; return a; }
+    inline constexpr vec3& operator+=(vec3& a, float b)                      { a.x += b; a.y += b; a.z += b; return a; }
+    inline constexpr vec3& operator-=(vec3& a, float b)                      { a.x -= b; a.y -= b; a.z -= b; return a; }
+    inline constexpr vec3& operator*=(vec3& a, float b)                      { a.x *= b; a.y *= b; a.z *= b; return a; }
+    inline constexpr vec3& operator/=(vec3& a, float b)                      { a.x /= b; a.y /= b; a.z /= b; return a; }
+    inline MSC_MATH_CONSTEXPR bool operator==(const vec3& a, const vec3& b)  { return fabsf(a.x - b.x) < EPS && fabsf(a.y - b.y) < EPS && fabsf(a.z - b.z) < EPS; }
+    inline MSC_MATH_CONSTEXPR bool operator!=(const vec3& a, const vec3& b)  { return !(a == b); }
 
-    inline constexpr vec4 operator+(const vec4& a, float b)         { return vec4{ a.x + b, a.y + b, a.z + b, a.w + b }; }
-    inline constexpr vec4 operator+(float b, const vec4& a)         { return vec4{ a.x + b, a.y + b, a.z + b, a.w + b }; }
-    inline constexpr vec4 operator+(const vec4& a, const vec4& b)   { return vec4{ a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w }; }
-    inline constexpr vec4 operator-(const vec4& a, float b)         { return vec4{ a.x - b, a.y - b, a.z - b, a.w - b }; }
-    inline constexpr vec4 operator-(float b, const vec4& a)         { return vec4{ a.x - b, a.y - b, a.z - b, a.w - b }; }
-    inline constexpr vec4 operator-(const vec4& a, const vec4& b)   { return vec4{ a.x - b.x, a.y - b.y, a.z - b.z, a.w - b.w }; }
-    inline constexpr vec4 operator*(const vec4& a, float b)         { return vec4{ a.x * b, a.y * b, a.z * b, a.w * b }; }
-    inline constexpr vec4 operator*(float b, const vec4& a)         { return vec4{ a.x * b, a.y * b, a.z * b, a.w * b }; }
-    inline constexpr vec4 operator*(const vec4& a, const vec4& b)   { return vec4{ a.x * b.x, a.y * b.y, a.z * b.z, a.w * b.w }; }
-    inline constexpr vec4 operator/(const vec4& a, float b)         { return vec4{ a.x / b, a.y / b, a.z / b, a.w / b }; }
-    inline constexpr vec4 operator/(float b, const vec4& a)         { return vec4{ a.x / b, a.y / b, a.z / b, a.w / b }; }
-    inline constexpr vec4 operator/(const vec4& a, const vec4& b)   { return vec4{ a.x / b.x, a.y / b.y, a.z / b.z, a.w / b.w }; }
-    inline constexpr vec4& operator+=(vec4& a, const vec4& b)       { a.x += b.x; a.y += b.y; a.z += b.z; a.w += b.w; return a; }
-    inline constexpr vec4& operator-=(vec4& a, const vec4& b)       { a.x -= b.x; a.y -= b.y; a.z -= b.z; a.w -= b.w; return a; }
-    inline constexpr vec4& operator*=(vec4& a, const vec4& b)       { a.x *= b.x; a.y *= b.y; a.z *= b.z; a.w *= b.w; return a; }
-    inline constexpr vec4& operator/=(vec4& a, const vec4& b)       { a.x /= b.x; a.y /= b.y; a.z /= b.z; a.w /= b.w; return a; }
-    inline constexpr vec4& operator+=(vec4& a, float b)             { a.x += b; a.y += b; a.z += b; a.w += b; return a; }
-    inline constexpr vec4& operator-=(vec4& a, float b)             { a.x -= b; a.y -= b; a.z -= b; a.w -= b; return a; }
-    inline constexpr vec4& operator*=(vec4& a, float b)             { a.x *= b; a.y *= b; a.z *= b; a.w *= b; return a; }
-    inline constexpr vec4& operator/=(vec4& a, float b)             { a.x /= b; a.y /= b; a.z /= b; a.w /= b; return a; }
-    inline constexpr bool operator==(const vec4& a, const vec4& b)  { return fabsf(a.x - b.x) < EPS && fabsf(a.y - b.y) < EPS && fabsf(a.z - b.z) < EPS && fabsf(a.w - b.w) < EPS; }
-    inline constexpr bool operator!=(const vec4& a, const vec4& b)  { return !(a == b); }
+    inline constexpr vec4 operator+(const vec4& a, float b)                  { return vec4{ a.x + b, a.y + b, a.z + b, a.w + b }; }
+    inline constexpr vec4 operator+(float b, const vec4& a)                  { return vec4{ a.x + b, a.y + b, a.z + b, a.w + b }; }
+    inline constexpr vec4 operator+(const vec4& a, const vec4& b)            { return vec4{ a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w }; }
+    inline constexpr vec4 operator-(const vec4& a, float b)                  { return vec4{ a.x - b, a.y - b, a.z - b, a.w - b }; }
+    inline constexpr vec4 operator-(float b, const vec4& a)                  { return vec4{ a.x - b, a.y - b, a.z - b, a.w - b }; }
+    inline constexpr vec4 operator-(const vec4& a, const vec4& b)            { return vec4{ a.x - b.x, a.y - b.y, a.z - b.z, a.w - b.w }; }
+    inline constexpr vec4 operator*(const vec4& a, float b)                  { return vec4{ a.x * b, a.y * b, a.z * b, a.w * b }; }
+    inline constexpr vec4 operator*(float b, const vec4& a)                  { return vec4{ a.x * b, a.y * b, a.z * b, a.w * b }; }
+    inline constexpr vec4 operator*(const vec4& a, const vec4& b)            { return vec4{ a.x * b.x, a.y * b.y, a.z * b.z, a.w * b.w }; }
+    inline constexpr vec4 operator/(const vec4& a, float b)                  { return vec4{ a.x / b, a.y / b, a.z / b, a.w / b }; }
+    inline constexpr vec4 operator/(float b, const vec4& a)                  { return vec4{ a.x / b, a.y / b, a.z / b, a.w / b }; }
+    inline constexpr vec4 operator/(const vec4& a, const vec4& b)            { return vec4{ a.x / b.x, a.y / b.y, a.z / b.z, a.w / b.w }; }
+    inline constexpr vec4& operator+=(vec4& a, const vec4& b)                { a.x += b.x; a.y += b.y; a.z += b.z; a.w += b.w; return a; }
+    inline constexpr vec4& operator-=(vec4& a, const vec4& b)                { a.x -= b.x; a.y -= b.y; a.z -= b.z; a.w -= b.w; return a; }
+    inline constexpr vec4& operator*=(vec4& a, const vec4& b)                { a.x *= b.x; a.y *= b.y; a.z *= b.z; a.w *= b.w; return a; }
+    inline constexpr vec4& operator/=(vec4& a, const vec4& b)                { a.x /= b.x; a.y /= b.y; a.z /= b.z; a.w /= b.w; return a; }
+    inline constexpr vec4& operator+=(vec4& a, float b)                      { a.x += b; a.y += b; a.z += b; a.w += b; return a; }
+    inline constexpr vec4& operator-=(vec4& a, float b)                      { a.x -= b; a.y -= b; a.z -= b; a.w -= b; return a; }
+    inline constexpr vec4& operator*=(vec4& a, float b)                      { a.x *= b; a.y *= b; a.z *= b; a.w *= b; return a; }
+    inline constexpr vec4& operator/=(vec4& a, float b)                      { a.x /= b; a.y /= b; a.z /= b; a.w /= b; return a; }
+    inline MSC_MATH_CONSTEXPR bool operator==(const vec4& a, const vec4& b)  { return fabsf(a.x - b.x) < EPS && fabsf(a.y - b.y) < EPS && fabsf(a.z - b.z) < EPS && fabsf(a.w - b.w) < EPS; }
+    inline MSC_MATH_CONSTEXPR bool operator!=(const vec4& a, const vec4& b)  { return !(a == b); }
 
     inline constexpr mat3 operator*(const mat3& a, const mat3& b)
     {
@@ -452,7 +454,3 @@ namespace gfx
     };
 }
 }
-
-#if defined(_MSC_VER) && _MSC_VER <= 3000
- #undef constexpr
-#endif
