@@ -430,6 +430,26 @@ namespace math
             vec4{       0.0f,   0.0f, -(2.0f * zfar * znear) / delta,  0.0f }
         };
     }
+	
+namespace fast
+{
+    float atan2f(float y, float x)
+    {
+        static constexpr float c1 = PI / 4.0f;
+        static constexpr float c2 = PI * 3.0f / 4.0f;
+        
+        float result = .0f;
+        if (y != 0 || x != 0)
+        {
+            float abs_y = fabsf(y);
+            float angle = (x >= 0)? c1 - c1 * ((x - abs_y) / (x + abs_y)) : c2 - c1 * ((x + abs_y) / (abs_y - x));
+            result = (y < 0)? -angle : angle;
+        }
+
+        return result;
+    }
+}
+
 }
 
 namespace gfx
