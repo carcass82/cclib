@@ -42,6 +42,9 @@ namespace util
 
     template<typename T, size_t N>
     constexpr inline uint32_t array_size(const T(&)[N]) { return N; }
+	
+	template<typename T>
+    constexpr inline void swap(T& a, T& b) { T tmp(a); a = b; b = tmp; }
 
     template<typename T>
     constexpr inline T sign(const T& x) { return T((x > T(0)) - (x < T(0))); }
