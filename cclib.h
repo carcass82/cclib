@@ -12,6 +12,7 @@
 #include <limits>
 #include <cassert>
 #include <cmath>
+#include <xmmintrin.h>
 
 // MS compiler does not like constexpr spec with common math functions (abs, tan, ...)
 #if defined(_MSC_VER)
@@ -54,6 +55,38 @@ namespace math
     constexpr float PI = 3.1415926535897932f;
     constexpr float PI_2 = 1.57079632679f;
     constexpr float EPS = 1.e-8f;
+
+namespace fast
+{
+    inline float rcp(float x)
+    {
+        return _mm_cvtss_f32(_mm_rcp_ss(_mm_set_ss(x)));
+    }
+        
+    inline float rsqrt(float x)
+    {
+        return _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(x)));
+
+        //float rsqrt_tmp = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(x)));
+        //return rsqrt_tmp * (1.5f - x * 0.5f * rsqrt_tmp * rsqrt_tmp);
+    }
+
+    float atan2f(float y, float x)
+    {
+        static constexpr float c1 = PI / 4.0f;
+        static constexpr float c2 = PI * 3.0f / 4.0f;
+
+        float result = .0f;
+        if (y != 0 || x != 0)
+        {
+            float abs_y = fabsf(y);
+            float angle = (x >= 0) ? c1 - c1 * ((x - abs_y) / (x + abs_y)) : c2 - c1 * ((x + abs_y) / (abs_y - x));
+            result = (y < 0) ? -angle : angle;
+        }
+
+        return result;
+    }
+}
 
 
     //
@@ -309,7 +342,8 @@ namespace math
 
     vec3 normalize(const vec3& a)
     {
-        return a * (1.0f / length(a));
+        float inv_len = fast::rsqrt(length2(a));
+        return a * inv_len;
     }
 
     constexpr vec3 reflect(const vec3& I, const vec3& N)
