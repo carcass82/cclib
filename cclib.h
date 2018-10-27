@@ -206,6 +206,7 @@ namespace fast
     inline constexpr vec2 operator+(const vec2& a, float b)                  { return vec2{ a.x + b, a.y + b }; }
     inline constexpr vec2 operator+(float b, const vec2& a)                  { return vec2{ a.x + b, a.y + b }; }
     inline constexpr vec2 operator+(const vec2& a, const vec2& b)            { return vec2{ a.x + b.x, a.y + b.y }; }
+    inline constexpr vec2 operator-(const vec2& a)                           { return vec2{ -a.x, -a.y }; }
     inline constexpr vec2 operator-(const vec2& a, float b)                  { return vec2{ a.x - b, a.y - b }; }
     inline constexpr vec2 operator-(float b, const vec2& a)                  { return vec2{ a.x - b, a.y - b }; }
     inline constexpr vec2 operator-(const vec2& a, const vec2& b)            { return vec2{ a.x - b.x, a.y - b.y }; }
@@ -225,6 +226,7 @@ namespace fast
     inline constexpr vec3 operator+(const vec3& a, float b)                  { return vec3{ a.x + b, a.y + b, a.z + b }; }
     inline constexpr vec3 operator+(float b, const vec3& a)                  { return vec3{ a.x + b, a.y + b, a.z + b }; }
     inline constexpr vec3 operator+(const vec3& a, const vec3& b)            { return vec3{ a.x + b.x, a.y + b.y, a.z + b.z }; }
+    inline constexpr vec3 operator-(const vec3& a)                           { return vec3{ -a.x, -a.y, -a.z }; }
     inline constexpr vec3 operator-(const vec3& a, float b)                  { return vec3{ a.x - b, a.y - b, a.z - b }; }
     inline constexpr vec3 operator-(float b, const vec3& a)                  { return vec3{ a.x - b, a.y - b, a.z - b }; }
     inline constexpr vec3 operator-(const vec3& a, const vec3& b)            { return vec3{ a.x - b.x, a.y - b.y, a.z - b.z }; }
@@ -248,6 +250,7 @@ namespace fast
     inline constexpr vec4 operator+(const vec4& a, float b)                  { return vec4{ a.x + b, a.y + b, a.z + b, a.w + b }; }
     inline constexpr vec4 operator+(float b, const vec4& a)                  { return vec4{ a.x + b, a.y + b, a.z + b, a.w + b }; }
     inline constexpr vec4 operator+(const vec4& a, const vec4& b)            { return vec4{ a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w }; }
+    inline constexpr vec4 operator-(const vec4& a)                           { return vec4{ -a.x, -a.y, -a.z, -a.w }; }
     inline constexpr vec4 operator-(const vec4& a, float b)                  { return vec4{ a.x - b, a.y - b, a.z - b, a.w - b }; }
     inline constexpr vec4 operator-(float b, const vec4& a)                  { return vec4{ a.x - b, a.y - b, a.z - b, a.w - b }; }
     inline constexpr vec4 operator-(const vec4& a, const vec4& b)            { return vec4{ a.x - b.x, a.y - b.y, a.z - b.z, a.w - b.w }; }
