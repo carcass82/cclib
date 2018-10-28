@@ -68,16 +68,14 @@ namespace fast
         
     inline float rsqrt(float x)
     {
-        //return _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(x)));
-
         float rsqrt_tmp = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(x)));
         return rsqrt_tmp * (1.5f - x * 0.5f * rsqrt_tmp * rsqrt_tmp);
     }
 
     constexpr float atan2f(float y, float x)
     {
-        static constexpr float c1 = PI / 4.0f;
-        static constexpr float c2 = PI * 3.0f / 4.0f;
+        constexpr float c1 = PI / 4.0f;
+        constexpr float c2 = PI * 3.0f / 4.0f;
 
         float result = .0f;
         if (y != 0 || x != 0)
