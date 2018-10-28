@@ -12,7 +12,12 @@
 #include <limits>
 #include <cassert>
 #include <cmath>
-#include <xmmintrin.h>
+
+#if defined(_MSC_VER)
+ #include <intrin.h>
+#else
+ #include <x86intrin.h>
+#endif
 
 // MS compiler does not like constexpr spec with common math functions (abs, tan, ...)
 #if defined(_MSC_VER)
