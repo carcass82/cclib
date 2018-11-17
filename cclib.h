@@ -19,13 +19,6 @@
  #include <x86intrin.h>
 #endif
 
-// MS compiler does not like constexpr spec with common math functions (abs, tan, ...)
-#if defined(_MSC_VER)
- #define MSC_MATH_CONSTEXPR 
-#else
- #define MSC_MATH_CONSTEXPR constexpr
-#endif
-
 namespace cc
 {
 namespace util
@@ -53,6 +46,9 @@ namespace util
 
     template<typename T>
     constexpr inline T sign(const T& x) { return T((x > T(0)) - (x < T(0))); }
+
+    template<typename T>
+    constexpr inline T abs(const T& a) { return (a < T(0)) ? -a : a; }
 }
 
 namespace math
@@ -92,6 +88,69 @@ namespace fast
 
         return result;
     }
+
+    constexpr int MAX_ANGLE_SAMPLES = 512;
+    constexpr float SINLUT[MAX_ANGLE_SAMPLES] = {
+        +0.000000f, +0.012272f, +0.024541f, +0.036807f, +0.049068f, +0.061321f, +0.073565f, +0.085797f, +0.098017f, +0.110222f, +0.122411f, +0.134581f, +0.146730f, +0.158858f, +0.170962f, +0.183040f,
+        +0.195090f, +0.207111f, +0.219101f, +0.231058f, +0.242980f, +0.254866f, +0.266713f, +0.278520f, +0.290285f, +0.302006f, +0.313682f, +0.325310f, +0.336890f, +0.348419f, +0.359895f, +0.371317f,
+        +0.382683f, +0.393992f, +0.405241f, +0.416430f, +0.427555f, +0.438616f, +0.449611f, +0.460539f, +0.471397f, +0.482184f, +0.492898f, +0.503538f, +0.514103f, +0.524590f, +0.534998f, +0.545325f,
+        +0.555570f, +0.565732f, +0.575808f, +0.585798f, +0.595699f, +0.605511f, +0.615232f, +0.624860f, +0.634393f, +0.643832f, +0.653173f, +0.662416f, +0.671559f, +0.680601f, +0.689541f, +0.698376f,
+        +0.707107f, +0.715731f, +0.724247f, +0.732654f, +0.740951f, +0.749136f, +0.757209f, +0.765167f, +0.773010f, +0.780737f, +0.788346f, +0.795837f, +0.803208f, +0.810457f, +0.817585f, +0.824589f,
+        +0.831470f, +0.838225f, +0.844854f, +0.851355f, +0.857729f, +0.863973f, +0.870087f, +0.876070f, +0.881921f, +0.887640f, +0.893224f, +0.898674f, +0.903989f, +0.909168f, +0.914210f, +0.919114f,
+        +0.923880f, +0.928506f, +0.932993f, +0.937339f, +0.941544f, +0.945607f, +0.949528f, +0.953306f, +0.956940f, +0.960431f, +0.963776f, +0.966976f, +0.970031f, +0.972940f, +0.975702f, +0.978317f,
+        +0.980785f, +0.983105f, +0.985278f, +0.987301f, +0.989177f, +0.990903f, +0.992480f, +0.993907f, +0.995185f, +0.996313f, +0.997290f, +0.998118f, +0.998795f, +0.999322f, +0.999699f, +0.999925f,
+        +1.000000f, +0.999925f, +0.999699f, +0.999322f, +0.998795f, +0.998118f, +0.997290f, +0.996313f, +0.995185f, +0.993907f, +0.992480f, +0.990903f, +0.989177f, +0.987301f, +0.985278f, +0.983105f,
+        +0.980785f, +0.978317f, +0.975702f, +0.972940f, +0.970031f, +0.966976f, +0.963776f, +0.960431f, +0.956940f, +0.953306f, +0.949528f, +0.945607f, +0.941544f, +0.937339f, +0.932993f, +0.928506f,
+        +0.923880f, +0.919114f, +0.914210f, +0.909168f, +0.903989f, +0.898674f, +0.893224f, +0.887640f, +0.881921f, +0.876070f, +0.870087f, +0.863973f, +0.857729f, +0.851355f, +0.844854f, +0.838225f,
+        +0.831470f, +0.824589f, +0.817585f, +0.810457f, +0.803207f, +0.795837f, +0.788346f, +0.780737f, +0.773010f, +0.765167f, +0.757209f, +0.749136f, +0.740951f, +0.732654f, +0.724247f, +0.715731f,
+        +0.707107f, +0.698376f, +0.689540f, +0.680601f, +0.671559f, +0.662416f, +0.653173f, +0.643831f, +0.634393f, +0.624859f, +0.615232f, +0.605511f, +0.595699f, +0.585798f, +0.575808f, +0.565732f,
+        +0.555570f, +0.545325f, +0.534998f, +0.524590f, +0.514103f, +0.503538f, +0.492898f, +0.482184f, +0.471397f, +0.460539f, +0.449611f, +0.438616f, +0.427555f, +0.416429f, +0.405241f, +0.393992f,
+        +0.382683f, +0.371317f, +0.359895f, +0.348419f, +0.336890f, +0.325310f, +0.313682f, +0.302006f, +0.290285f, +0.278520f, +0.266713f, +0.254866f, +0.242980f, +0.231058f, +0.219101f, +0.207111f,
+        +0.195090f, +0.183040f, +0.170962f, +0.158858f, +0.146730f, +0.134581f, +0.122411f, +0.110222f, +0.098017f, +0.085797f, +0.073564f, +0.061321f, +0.049068f, +0.036807f, +0.024541f, +0.012271f,
+        -0.000000f, -0.012272f, -0.024541f, -0.036807f, -0.049068f, -0.061321f, -0.073565f, -0.085797f, -0.098017f, -0.110222f, -0.122411f, -0.134581f, -0.146731f, -0.158858f, -0.170962f, -0.183040f,
+        -0.195090f, -0.207111f, -0.219101f, -0.231058f, -0.242980f, -0.254866f, -0.266713f, -0.278520f, -0.290285f, -0.302006f, -0.313682f, -0.325310f, -0.336890f, -0.348419f, -0.359895f, -0.371317f,
+        -0.382684f, -0.393992f, -0.405241f, -0.416430f, -0.427555f, -0.438616f, -0.449611f, -0.460539f, -0.471397f, -0.482184f, -0.492898f, -0.503538f, -0.514103f, -0.524590f, -0.534998f, -0.545325f,
+        -0.555570f, -0.565732f, -0.575808f, -0.585798f, -0.595699f, -0.605511f, -0.615232f, -0.624860f, -0.634393f, -0.643832f, -0.653173f, -0.662416f, -0.671559f, -0.680601f, -0.689541f, -0.698376f,
+        -0.707107f, -0.715731f, -0.724247f, -0.732654f, -0.740951f, -0.749136f, -0.757209f, -0.765167f, -0.773011f, -0.780737f, -0.788346f, -0.795837f, -0.803208f, -0.810457f, -0.817585f, -0.824589f,
+        -0.831470f, -0.838225f, -0.844854f, -0.851355f, -0.857729f, -0.863973f, -0.870087f, -0.876070f, -0.881921f, -0.887640f, -0.893224f, -0.898675f, -0.903989f, -0.909168f, -0.914210f, -0.919114f,
+        -0.923880f, -0.928506f, -0.932993f, -0.937339f, -0.941544f, -0.945607f, -0.949528f, -0.953306f, -0.956940f, -0.960431f, -0.963776f, -0.966977f, -0.970031f, -0.972940f, -0.975702f, -0.978317f,
+        -0.980785f, -0.983106f, -0.985278f, -0.987301f, -0.989177f, -0.990903f, -0.992480f, -0.993907f, -0.995185f, -0.996313f, -0.997290f, -0.998118f, -0.998795f, -0.999322f, -0.999699f, -0.999925f,
+        -1.000000f, -0.999925f, -0.999699f, -0.999322f, -0.998795f, -0.998118f, -0.997290f, -0.996313f, -0.995185f, -0.993907f, -0.992480f, -0.990903f, -0.989176f, -0.987301f, -0.985278f, -0.983105f,
+        -0.980785f, -0.978317f, -0.975702f, -0.972940f, -0.970031f, -0.966976f, -0.963776f, -0.960430f, -0.956940f, -0.953306f, -0.949528f, -0.945607f, -0.941544f, -0.937339f, -0.932993f, -0.928506f,
+        -0.923879f, -0.919114f, -0.914210f, -0.909168f, -0.903989f, -0.898674f, -0.893224f, -0.887640f, -0.881921f, -0.876070f, -0.870087f, -0.863973f, -0.857729f, -0.851355f, -0.844853f, -0.838225f,
+        -0.831470f, -0.824589f, -0.817585f, -0.810457f, -0.803207f, -0.795837f, -0.788346f, -0.780737f, -0.773010f, -0.765167f, -0.757209f, -0.749136f, -0.740951f, -0.732654f, -0.724247f, -0.715731f,
+        -0.707107f, -0.698376f, -0.689540f, -0.680601f, -0.671559f, -0.662416f, -0.653173f, -0.643831f, -0.634393f, -0.624859f, -0.615231f, -0.605511f, -0.595699f, -0.585798f, -0.575808f, -0.565732f,
+        -0.555570f, -0.545325f, -0.534997f, -0.524590f, -0.514103f, -0.503538f, -0.492898f, -0.482184f, -0.471397f, -0.460539f, -0.449611f, -0.438616f, -0.427555f, -0.416429f, -0.405241f, -0.393992f,
+        -0.382683f, -0.371317f, -0.359895f, -0.348419f, -0.336890f, -0.325310f, -0.313682f, -0.302006f, -0.290285f, -0.278520f, -0.266713f, -0.254865f, -0.242980f, -0.231058f, -0.219101f, -0.207111f,
+        -0.195090f, -0.183040f, -0.170962f, -0.158858f, -0.146730f, -0.134581f, -0.122411f, -0.110222f, -0.098017f, -0.085797f, -0.073564f, -0.061321f, -0.049068f, -0.036807f, -0.024541f, -0.012271f
+    };
+
+    constexpr float sinf(float x)
+    {
+        float f = x * (MAX_ANGLE_SAMPLES / 2) / PI;
+        if (f < 0.f)
+        {
+            return SINLUT[(-((-int(f)) & (MAX_ANGLE_SAMPLES - 1))) + MAX_ANGLE_SAMPLES];
+            
+        }
+        else
+        {
+            return SINLUT[int(f) & (MAX_ANGLE_SAMPLES - 1)];
+        }
+    }
+
+    constexpr float cosf(float x)
+    {
+        float f = x * (MAX_ANGLE_SAMPLES / 2) / PI;
+        if (f < 0.f)
+        {
+            return SINLUT[((-int(f)) + (MAX_ANGLE_SAMPLES / 4)) & (MAX_ANGLE_SAMPLES - 1)];
+        }
+        else
+        {
+            return SINLUT[(int(f) + (MAX_ANGLE_SAMPLES / 4)) & (MAX_ANGLE_SAMPLES - 1)];
+        }
+    }
 }
 
 
@@ -104,7 +163,7 @@ namespace fast
 
 
     // cotangent
-    MSC_MATH_CONSTEXPR inline float cot(float x) { return cosf(x) / sinf(x); }
+    constexpr inline float cot(float x) { return fast::cosf(x) / fast::sinf(x); }
 
 
     //
@@ -223,8 +282,8 @@ namespace fast
     inline constexpr vec2& operator-=(vec2& a, float b)                      { a.x -= b; a.y -= b; return a; }
     inline constexpr vec2& operator*=(vec2& a, float b)                      { a.x *= b; a.y *= b; return a; }
     inline constexpr vec2& operator/=(vec2& a, float b)                      { a.x /= b; a.y /= b; return a; }
-    inline MSC_MATH_CONSTEXPR bool operator==(const vec2& a, const vec2& b)  { return fabsf(a.x - b.x) < EPS && fabsf(a.y - b.y) < EPS; }
-    inline MSC_MATH_CONSTEXPR bool operator!=(const vec2& a, const vec2& b)  { return !(a == b); }
+    inline constexpr bool operator==(const vec2& a, const vec2& b)           { return util::abs(a.x - b.x) < EPS && util::abs(a.y - b.y) < EPS; }
+    inline constexpr bool operator!=(const vec2& a, const vec2& b)           { return !(a == b); }
 
     inline constexpr vec3 operator+(const vec3& a, float b)                  { return vec3{ a.x + b, a.y + b, a.z + b }; }
     inline constexpr vec3 operator+(float b, const vec3& a)                  { return vec3{ a.x + b, a.y + b, a.z + b }; }
@@ -247,8 +306,8 @@ namespace fast
     inline constexpr vec3& operator-=(vec3& a, float b)                      { a.x -= b; a.y -= b; a.z -= b; return a; }
     inline constexpr vec3& operator*=(vec3& a, float b)                      { a.x *= b; a.y *= b; a.z *= b; return a; }
     inline constexpr vec3& operator/=(vec3& a, float b)                      { a.x /= b; a.y /= b; a.z /= b; return a; }
-    inline MSC_MATH_CONSTEXPR bool operator==(const vec3& a, const vec3& b)  { return fabsf(a.x - b.x) < EPS && fabsf(a.y - b.y) < EPS && fabsf(a.z - b.z) < EPS; }
-    inline MSC_MATH_CONSTEXPR bool operator!=(const vec3& a, const vec3& b)  { return !(a == b); }
+    inline constexpr bool operator==(const vec3& a, const vec3& b)           { return util::abs(a.x - b.x) < EPS && util::abs(a.y - b.y) < EPS && util::abs(a.z - b.z) < EPS; }
+    inline constexpr bool operator!=(const vec3& a, const vec3& b)           { return !(a == b); }
 
     inline constexpr vec4 operator+(const vec4& a, float b)                  { return vec4{ a.x + b, a.y + b, a.z + b, a.w + b }; }
     inline constexpr vec4 operator+(float b, const vec4& a)                  { return vec4{ a.x + b, a.y + b, a.z + b, a.w + b }; }
@@ -271,8 +330,8 @@ namespace fast
     inline constexpr vec4& operator-=(vec4& a, float b)                      { a.x -= b; a.y -= b; a.z -= b; a.w -= b; return a; }
     inline constexpr vec4& operator*=(vec4& a, float b)                      { a.x *= b; a.y *= b; a.z *= b; a.w *= b; return a; }
     inline constexpr vec4& operator/=(vec4& a, float b)                      { a.x /= b; a.y /= b; a.z /= b; a.w /= b; return a; }
-    inline MSC_MATH_CONSTEXPR bool operator==(const vec4& a, const vec4& b)  { return fabsf(a.x - b.x) < EPS && fabsf(a.y - b.y) < EPS && fabsf(a.z - b.z) < EPS && fabsf(a.w - b.w) < EPS; }
-    inline MSC_MATH_CONSTEXPR bool operator!=(const vec4& a, const vec4& b)  { return !(a == b); }
+    inline constexpr bool operator==(const vec4& a, const vec4& b)           { return util::abs(a.x - b.x) < EPS && util::abs(a.y - b.y) < EPS && util::abs(a.z - b.z) < EPS && util::abs(a.w - b.w) < EPS; }
+    inline constexpr bool operator!=(const vec4& a, const vec4& b)           { return !(a == b); }
 
     inline constexpr mat3 operator*(const mat3& a, const mat3& b)
     {
@@ -389,8 +448,8 @@ namespace fast
         [0  sin(-X)   cos(-X)  0]
         [0        0         0  1]
         */
-        const float cx = cosf(angle * axis_n.x);
-        const float sx = sinf(angle * axis_n.x);
+        const float cx = fast::cosf(angle * axis_n.x);
+        const float sx = fast::sinf(angle * axis_n.x);
         mat4 rotX
         {
             vec4{ 1,   0,   0,  0 },
@@ -405,8 +464,8 @@ namespace fast
         [-sin(-Y)  0  cos(-Y)  0]
         [       0  0        0  1]
         */
-        const float cy = cosf(angle * axis_n.y);
-        const float sy = sinf(angle * axis_n.y);
+        const float cy = fast::cosf(angle * axis_n.y);
+        const float sy = fast::sinf(angle * axis_n.y);
         mat4 rotY
         {
             vec4{ cy,  0, -sy,  0 },
@@ -421,8 +480,8 @@ namespace fast
         [      0         0  1  0]
         [      0         0  0  1]
         */
-        const float cz = cosf(angle * axis_n.z);
-        const float sz = sinf(angle * axis_n.z);
+        const float cz = fast::cosf(angle * axis_n.z);
+        const float sz = fast::sinf(angle * axis_n.z);
         mat4 rotZ
         {
             vec4{  cz,  sz,  0,  0 },
