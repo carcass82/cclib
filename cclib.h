@@ -159,7 +159,9 @@ namespace fast
     //
     constexpr inline float radians(float deg)                { return deg * PI / 180.0f; }
     constexpr inline float degrees(float rad)                { return rad * 180.0f / PI; }
-    constexpr inline float lerp(float v0, float v1, float t) { return (1.0f - t) * v0 + t * v1; }
+    
+    template<typename T>
+    constexpr inline T lerp(const T& v0, const T& v1, float t) { return (1.0f - t) * v0 + t * v1; }
 
 
     // cotangent
@@ -532,5 +534,27 @@ namespace fast
             vec4{       0.0f,   0.0f, -(2.0f * zfar * znear) / delta,  0.0f }
         };
     }
+}
+
+namespace gfx
+{
+    struct bbox
+    {
+        math::vec3 vmin;
+        math::vec3 vmax;
+
+        void Add(const math::vec3& v)
+        {
+            vmin.x = util::min(vmin.x, v.x);
+            vmin.y = util::min(vmin.y, v.y);
+            vmin.z = util::min(vmin.z, v.z);
+            vmax.x = util::max(vmax.x, v.x);
+            vmax.y = util::max(vmax.y, v.y);
+            vmax.z = util::max(vmax.z, v.z);
+        }
+
+        math::vec3 Size() const   { return math::vec3{ vmax.x - vmin.x, vmax.y - vmin.y, vmax.z - vmin.z };  }
+        math::vec3 Center() const { return math::vec3{ (vmax.x + vmin.x) / 2.f, (vmax.y + vmin.y) / 2.f, (vmax.z + vmin.z) / 2.f }; }
+    };
 }
 }
