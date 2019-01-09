@@ -170,19 +170,19 @@ int main()
 	float rmse = .0f;
 	
 	test_atan2(values, &avg_cclib, &avg_stdlib, &rmse);
-	printf("atan2f(y, x): cclib: %02.2f / stdlib: %02.2f (speedup: %+d%% RMSE: %.3f)\n", avg_cclib, avg_stdlib, int(((avg_stdlib - avg_cclib) * 100.f / avg_stdlib)), rmse);
+	printf("atan2f(y, x): cclib: %05.2fms - stdlib: %05.2fms (speedup: %+d%% RMSE: %.3f)\n", avg_cclib, avg_stdlib, int(((avg_stdlib - avg_cclib) * 100.f / avg_stdlib)), rmse);
 	
 	test_rcp(values, &avg_cclib, &avg_stdlib, &rmse);
-	printf("rcp(x):       cclib: %02.2f / stdlib: %02.2f (speedup: %+d%% RMSE: %.3f)\n", avg_cclib, avg_stdlib, int(((avg_stdlib - avg_cclib) * 100.f / avg_stdlib)), rmse);
+	printf("rcp(x):       cclib: %05.2fms - stdlib: %05.2fms (speedup: %+d%% RMSE: %.3f)\n", avg_cclib, avg_stdlib, int(((avg_stdlib - avg_cclib) * 100.f / avg_stdlib)), rmse);
 	
 	test_rsqrt(values, &avg_cclib, &avg_stdlib, &rmse);
-	printf("rsqrtf(x):    cclib: %02.2f / stdlib: %02.2f (speedup: %+d%% RMSE: %.3f)\n", avg_cclib, avg_stdlib, int(((avg_stdlib - avg_cclib) * 100.f / avg_stdlib)), rmse);
+	printf("rsqrtf(x):    cclib: %05.2fms - stdlib: %05.2fms (speedup: %+d%% RMSE: %.3f)\n", avg_cclib, avg_stdlib, int(((avg_stdlib - avg_cclib) * 100.f / avg_stdlib)), rmse);
 	
 	test_sin(values, &avg_cclib, &avg_stdlib, &rmse);
-	printf("sinf(x):      cclib: %02.2f / stdlib: %02.2f (speedup: %+d%% RMSE: %.3f)\n", avg_cclib, avg_stdlib, int(((avg_stdlib - avg_cclib) * 100.f / avg_stdlib)), rmse);
+	printf("sinf(x):      cclib: %05.2fms - stdlib: %05.2fms (speedup: %+d%% RMSE: %.3f)\n", avg_cclib, avg_stdlib, int(((avg_stdlib - avg_cclib) * 100.f / avg_stdlib)), rmse);
 	
 	test_cos(values, &avg_cclib, &avg_stdlib, &rmse);
-	printf("cosf(x):      cclib: %02.2f / stdlib: %02.2f (speedup: %+d%% RMSE: %.3f)\n", avg_cclib, avg_stdlib, int(((avg_stdlib - avg_cclib) * 100.f / avg_stdlib)), rmse);	
+	printf("cosf(x):      cclib: %05.2fms - stdlib: %05.2fms (speedup: %+d%% RMSE: %.3f)\n", avg_cclib, avg_stdlib, int(((avg_stdlib - avg_cclib) * 100.f / avg_stdlib)), rmse);	
 	
 	return 0;
 }
