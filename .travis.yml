@@ -11,5 +11,5 @@ addons:
 script:
       - mkdir build
       - cd build
-      - g++7 ../benchmark/benchmark.cpp -Ofast -march=native -obenchmark
+      - g++-7 ../benchmark/benchmark.cpp -std=c++1z -Ofast -march=native -obenchmark
       - ./benchmark
