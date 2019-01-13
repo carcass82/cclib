@@ -266,6 +266,14 @@ namespace fast
         constexpr inline explicit mat3(std::initializer_list<vec3> _m) : m{*_m.begin(), *(_m.begin() + 1), *(_m.begin() + 2)} { assert(_m.size() == 3); }
     };
 
+    //
+    // compatibility with GLM
+    //
+    constexpr inline const float* value_ptr(const vec2& v)                   { return &(v.v[0]); }
+    constexpr inline const float* value_ptr(const vec3& v)                   { return &(v.v[0]); }
+    constexpr inline const float* value_ptr(const vec4& v)                   { return &(v.v[0]); }
+    constexpr inline const float* value_ptr(const mat3& m)                   { return value_ptr(m.m[0]); }
+    constexpr inline const float* value_ptr(const mat4& m)                   { return value_ptr(m.m[0]); }
 
     //
     // operators
