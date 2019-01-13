@@ -62,6 +62,9 @@ namespace math
 
 namespace fast
 {
+    //
+    // (hopefully) faster but less accurate implementations than stdlib
+    //
     inline float rcp(float x)
     {
         return _mm_cvtss_f32(_mm_rcp_ss(_mm_set_ss(x)));
@@ -442,57 +445,22 @@ namespace fast
 
     inline mat4 rotate(const mat4& m, float angle, const vec3& axis)
     {
-        vec3 axis_n = normalize(axis);
+        const vec3 axis_n = normalize(axis);
+        const float x = axis_n.x;
+        const float y = axis_n.y;
+        const float z = axis_n.z;
+        const float c = fast::cosf(angle);
+        const float s = fast::sinf(angle);
 
-        /*
-        [1        0         0  0]
-        [0  cos(-X)  -sin(-X)  0]
-        [0  sin(-X)   cos(-X)  0]
-        [0        0         0  1]
-        */
-        const float cx = fast::cosf(angle * axis_n.x);
-        const float sx = fast::sinf(angle * axis_n.x);
-        mat4 rotX
+        const mat4 rot
         {
-            vec4{ 1,   0,   0,  0 },
-            vec4{ 0,  cx,  sx,  0 },
-            vec4{ 0, -sx,  cx,  0 },
-            vec4{ 0,   0,   0,  1 }
+            vec4{x * x * (1.f - c) + c,      x * y * (1.f - c) - z * s,  x * z * (1.f - c) + y * s,  0},
+            vec4{y * x * (1.f - c) + z * s,  y * y * (1.f - c) + c,      y * z * (1.f - c) - x * s,  0},
+            vec4{x * z * (1.f - c) - y * s,  y * z * (1.f - c) + x * s,  z * z * (1.f - c) + c,      0},
+            vec4{0,                          0,                          0,                          1}
         };
 
-        /*
-        [ cos(-Y)  0  sin(-Y)  0]
-        [       0  1        0  0]
-        [-sin(-Y)  0  cos(-Y)  0]
-        [       0  0        0  1]
-        */
-        const float cy = fast::cosf(angle * axis_n.y);
-        const float sy = fast::sinf(angle * axis_n.y);
-        mat4 rotY
-        {
-            vec4{ cy,  0, -sy,  0 },
-            vec4{  0,  1,   0,  0 },
-            vec4{ sy,  0,  cy,  0 },
-            vec4{  0,  0,   0,  1 }
-        };
-
-        /*
-        [cos(-Z)  -sin(-Z)  0  0]
-        [sin(-Z)   cos(-Z)  0  0]
-        [      0         0  1  0]
-        [      0         0  0  1]
-        */
-        const float cz = fast::cosf(angle * axis_n.z);
-        const float sz = fast::sinf(angle * axis_n.z);
-        mat4 rotZ
-        {
-            vec4{  cz,  sz,  0,  0 },
-            vec4{ -sz,  cz,  0,  0 },
-            vec4{   0,   0,  1,  0 },
-            vec4{   0,   0,  0,  1 }
-        };
-
-        return m * rotX * rotY * rotZ;
+        return m * rot;
     }
 
     constexpr inline mat4 scale(const mat4& m, const vec3& v)
