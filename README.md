@@ -1,5 +1,3 @@
-# cclib
+# cclib ![Build Status](https://travis-ci.org/carcass82/cclib.svg?branch=master)
 
 generic lib for most gfx projects
-
-![Build Status](https://img.shields.io/travis/carcass82/cclib.svg)
