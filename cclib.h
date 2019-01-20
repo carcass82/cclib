@@ -164,7 +164,7 @@ namespace fast
     constexpr inline float degrees(float rad)                { return rad * 180.0f / PI; }
     
     template<typename T>
-    constexpr inline T lerp(const T& v0, const T& v1, float t) { return (1.0f - t) * v0 + t * v1; }
+    constexpr inline T lerp(const T& v0, const T& v1, float t) { return v0 * t + v1 * (1.f - t); }
 
 
     // cotangent
