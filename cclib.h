@@ -33,7 +33,7 @@ namespace util
     constexpr inline const T& max(const T& a, const T& b) { return (a < b)? b : a; }
 
     template<typename T>
-    constexpr inline const T& clamp(const T& a, const T& lower, const T& upper) { return min(max(a, lower), upper); }
+    constexpr inline const T& clamp(const T& a, const T& lower, const T& upper) { return cc::util::min(cc::util::max(a, lower), upper); }
 
     template<typename T>
     constexpr inline const T& saturate(const T& a) { return clamp(a, T(0), T(1)); }
