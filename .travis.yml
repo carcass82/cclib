@@ -16,9 +16,11 @@ addons:
       - g++-8
 
 script:
-  - if [[ "$TRAVIS_OS_NAME" != "windows" && "$CXX" != "clang++" ]]; then export CXX=g++-8 ; fi
-  - if [[ "$TRAVIS_OS_NAME" != "windows"]]; then $(CXX) benchmark/benchmark.cpp -std=c++1z -Ofast -march=native -fno-rtti -funroll-loops -obenchmark; fi
+  - cd benchmark
 
-  - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then cl benchmark/benchmark.cpp /DNDEBUG /GR- /GL /Gs- /O2 /fp:fast /fp:except- /LTCG /INCREMENTAL:NO /OPT:REF
+  - if [[ "$TRAVIS_OS_NAME" != "windows" && "$CXX" != "clang++" ]]; then export CXX=g++-8 ; fi
+  - if [[ "$TRAVIS_OS_NAME" != "windows"]]; then $(CXX) benchmark.cpp -std=c++1z -Ofast -march=native -fno-rtti -funroll-loops -obenchmark ; fi
+
+  - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then cl benchmark.cpp /DNDEBUG /GR- /GL /Gs- /O2 /fp:fast /fp:except- /LTCG /INCREMENTAL:NO /OPT:REF ; fi
 
   - ./benchmark
