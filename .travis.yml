@@ -1,5 +1,12 @@
 language: cpp
-compiler: gcc
+
+matrix:
+  include:
+    - os: linux
+      compiler: gcc
+    - os: linux
+      compiler: clang
+    - os: windows
 
 addons:
   apt:
@@ -9,7 +16,9 @@ addons:
       - g++-8
 
 script:
-  - mkdir build
-  - cd build
-  - g++-8 ../benchmark/benchmark.cpp -std=c++1z -Ofast -march=native -obenchmark
+  - if [[ "$TRAVIS_OS_NAME" != "windows" && "$CXX" != "clang++" ]]; then export CXX=g++-8 ; fi
+  - if [[ "$TRAVIS_OS_NAME" != "windows"]]; then $(CXX) benchmark/benchmark.cpp -std=c++1z -Ofast -march=native -fno-rtti -funroll-loops -obenchmark; fi
+
+  - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then cl benchmark/benchmark.cpp /DNDEBUG /GR- /GL /Gs- /O2 /fp:fast /fp:except- /LTCG /INCREMENTAL:NO /OPT:REF
+
   - ./benchmark
