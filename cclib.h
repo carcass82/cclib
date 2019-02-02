@@ -462,9 +462,9 @@ namespace fast
 
         const mat4 rot
         {
-            vec4{x * x * (1.f - c) + c,      x * y * (1.f - c) - z * s,  x * z * (1.f - c) + y * s,  0},
-            vec4{y * x * (1.f - c) + z * s,  y * y * (1.f - c) + c,      y * z * (1.f - c) - x * s,  0},
-            vec4{x * z * (1.f - c) - y * s,  y * z * (1.f - c) + x * s,  z * z * (1.f - c) + c,      0},
+            vec4{x * x * (1.f - c) + c,      y * x * (1.f - c) + z * s,  x * z * (1.f - c) - y * s,  0},
+            vec4{x * y * (1.f - c) - z * s,  y * y * (1.f - c) + c,      y * z * (1.f - c) + x * s,  0},
+            vec4{x * z * (1.f - c) + y * s,  y * z * (1.f - c) - x * s,  z * z * (1.f - c) + c,      0},
             vec4{0,                          0,                          0,                          1}
         };
 
