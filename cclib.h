@@ -34,15 +34,15 @@ namespace util
     constexpr inline const T& max(const T& a, const T& b) { return (a < b)? b : a; }
 
     template<typename T>
-    constexpr inline const T& clamp(const T& a, const T& lower, const T& upper) { return cc::util::min(cc::util::max(a, lower), upper); }
+    constexpr inline const T& clamp(const T& a, const T& lower, const T& upper) { return util::min(util::max(a, lower), upper); }
 
     template<typename T>
     constexpr inline const T& saturate(const T& a) { return clamp(a, T(0), T(1)); }
 
     template<typename T, size_t N>
     constexpr inline uint32_t array_size(const T(&)[N]) { return N; }
-	
-	template<typename T>
+
+    template<typename T>
     constexpr inline void swap(T& a, T& b) { T tmp(a); a = b; b = tmp; }
 
     template<typename T>
@@ -79,22 +79,22 @@ namespace fast
 
     constexpr inline float atan2f(float y, float x)
     {
-        constexpr float c1 = PI / 4.0f;
-        constexpr float c2 = PI * 3.0f / 4.0f;
+        constexpr float c1 = PI / 4.f;
+        constexpr float c2 = PI * 3.f / 4.f;
 
         float result = .0f;
         if (y != 0 || x != 0)
         {
-            float abs_y = fabsf(y);
-            float angle = (x >= 0) ? c1 - c1 * ((x - abs_y) / (x + abs_y)) : c2 - c1 * ((x + abs_y) / (abs_y - x));
-            result = (y < 0) ? -angle : angle;
+            float angle = (x >= .0f)? c1 - c1 * ((x - fabsf(y)) / (x + fabsf(y))) :
+                                      c2 - c1 * ((x + fabsf(y)) / (fabsf(y) - x));
+            
+            result = (y < .0f)? -angle : angle;
         }
 
         return result;
     }
 
-    constexpr int MAX_ANGLE_SAMPLES = 512;
-    constexpr float SINLUT[MAX_ANGLE_SAMPLES] = {
+    constexpr float SINLUT[] = {
         +0.000000f, +0.012272f, +0.024541f, +0.036807f, +0.049068f, +0.061321f, +0.073565f, +0.085797f, +0.098017f, +0.110222f, +0.122411f, +0.134581f, +0.146730f, +0.158858f, +0.170962f, +0.183040f,
         +0.195090f, +0.207111f, +0.219101f, +0.231058f, +0.242980f, +0.254866f, +0.266713f, +0.278520f, +0.290285f, +0.302006f, +0.313682f, +0.325310f, +0.336890f, +0.348419f, +0.359895f, +0.371317f,
         +0.382683f, +0.393992f, +0.405241f, +0.416430f, +0.427555f, +0.438616f, +0.449611f, +0.460539f, +0.471397f, +0.482184f, +0.492898f, +0.503538f, +0.514103f, +0.524590f, +0.534998f, +0.545325f,
@@ -128,6 +128,7 @@ namespace fast
         -0.382683f, -0.371317f, -0.359895f, -0.348419f, -0.336890f, -0.325310f, -0.313682f, -0.302006f, -0.290285f, -0.278520f, -0.266713f, -0.254865f, -0.242980f, -0.231058f, -0.219101f, -0.207111f,
         -0.195090f, -0.183040f, -0.170962f, -0.158858f, -0.146730f, -0.134581f, -0.122411f, -0.110222f, -0.098017f, -0.085797f, -0.073564f, -0.061321f, -0.049068f, -0.036807f, -0.024541f, -0.012271f
     };
+    constexpr int MAX_ANGLE_SAMPLES = util::array_size(SINLUT);
 
     constexpr inline float sinf(float x)
     {
@@ -290,7 +291,7 @@ namespace fast
     constexpr inline vec2 operator*(float b, const vec2& a)                  { return vec2{ a.x * b, a.y * b }; }
     constexpr inline vec2 operator*(const vec2& a, const vec2& b)            { return vec2{ a.x * b.x, a.y * b.y }; }
     constexpr inline vec2 operator/(const vec2& a, float b)                  { return vec2{ a.x / b, a.y / b }; }
-    constexpr inline vec2 operator/(float b, const vec2& a)                  { return vec2{ a.x / b, a.y / b }; }
+    constexpr inline vec2 operator/(float a, const vec2& b)                  { return vec2{ a / b.x, a / b.y }; }
     constexpr inline vec2 operator/(const vec2& a, const vec2& b)            { return vec2{ a.x / b.x, a.y / b.y }; }
     constexpr inline vec2& operator+=(vec2& a, float b)                      { a.x += b; a.y += b; return a; }
     constexpr inline vec2& operator-=(vec2& a, float b)                      { a.x -= b; a.y -= b; return a; }
@@ -310,7 +311,7 @@ namespace fast
     constexpr inline vec3 operator*(float b, const vec3& a)                  { return vec3{ a.x * b, a.y * b, a.z * b }; }
     constexpr inline vec3 operator*(const vec3& a, const vec3& b)            { return vec3{ a.x * b.x, a.y * b.y, a.z * b.z }; }
     constexpr inline vec3 operator/(const vec3& a, float b)                  { return vec3{ a.x / b, a.y / b, a.z / b }; }
-    constexpr inline vec3 operator/(float b, const vec3& a)                  { return vec3{ a.x / b, a.y / b, a.z / b }; }
+    constexpr inline vec3 operator/(float a, const vec3& b)                  { return vec3{ a / b.x, a / b.y, a / b.z }; }
     constexpr inline vec3 operator/(const vec3& a, const vec3& b)            { return vec3{ a.x / b.x, a.y / b.y, a.z / b.z }; }
     constexpr inline vec3& operator+=(vec3& a, const vec3& b)                { a.x += b.x; a.y += b.y; a.z += b.z; return a; }
     constexpr inline vec3& operator-=(vec3& a, const vec3& b)                { a.x -= b.x; a.y -= b.y; a.z -= b.z; return a; }
@@ -334,7 +335,7 @@ namespace fast
     constexpr inline vec4 operator*(float b, const vec4& a)                  { return vec4{ a.x * b, a.y * b, a.z * b, a.w * b }; }
     constexpr inline vec4 operator*(const vec4& a, const vec4& b)            { return vec4{ a.x * b.x, a.y * b.y, a.z * b.z, a.w * b.w }; }
     constexpr inline vec4 operator/(const vec4& a, float b)                  { return vec4{ a.x / b, a.y / b, a.z / b, a.w / b }; }
-    constexpr inline vec4 operator/(float b, const vec4& a)                  { return vec4{ a.x / b, a.y / b, a.z / b, a.w / b }; }
+    constexpr inline vec4 operator/(float a, const vec4& b)                  { return vec4{ a / b.x, a / b.y, a / b.z, a / b.w }; }
     constexpr inline vec4 operator/(const vec4& a, const vec4& b)            { return vec4{ a.x / b.x, a.y / b.y, a.z / b.z, a.w / b.w }; }
     constexpr inline vec4& operator+=(vec4& a, const vec4& b)                { a.x += b.x; a.y += b.y; a.z += b.z; a.w += b.w; return a; }
     constexpr inline vec4& operator-=(vec4& a, const vec4& b)                { a.x -= b.x; a.y -= b.y; a.z -= b.z; a.w -= b.w; return a; }
@@ -424,8 +425,7 @@ namespace fast
 
     inline vec3 normalize(const vec3& a)
     {
-        float inv_len = fast::rsqrt(length2(a));
-        return a * inv_len;
+        return a / length(a);
     }
 
     constexpr inline vec3 reflect(const vec3& I, const vec3& N)
@@ -463,9 +463,9 @@ namespace fast
 
         const mat4 rot
         {
-            vec4{x * x * (1.f - c) + c,      x * y * (1.f - c) - z * s,  x * z * (1.f - c) + y * s,  0},
-            vec4{y * x * (1.f - c) + z * s,  y * y * (1.f - c) + c,      y * z * (1.f - c) - x * s,  0},
-            vec4{x * z * (1.f - c) - y * s,  y * z * (1.f - c) + x * s,  z * z * (1.f - c) + c,      0},
+            vec4{x * x * (1.f - c) + c,      y * x * (1.f - c) + z * s,  x * z * (1.f - c) - y * s,  0},
+            vec4{x * y * (1.f - c) - z * s,  y * y * (1.f - c) + c,      y * z * (1.f - c) + x * s,  0},
+            vec4{x * z * (1.f - c) + y * s,  y * z * (1.f - c) - x * s,  z * z * (1.f - c) + c,      0},
             vec4{0,                          0,                          0,                          1}
         };
 
