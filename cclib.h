@@ -12,6 +12,7 @@
 #include <limits>
 #include <cassert>
 #include <cmath>
+#include <initializer_list>
 
 #if defined(_MSC_VER)
  #include <intrin.h>
