@@ -362,19 +362,9 @@ namespace fast
     {
         return vec3
         {
-            a[0].x * b.x + a[0].y * b.y + a[0].z * b.z,
-            a[1].x * b.x + a[1].y * b.y + a[1].z * b.z,
-            a[2].x * b.x + a[2].y * b.y + a[2].z * b.z
-        };
-    }
-
-    constexpr inline vec3 operator*(const vec3& a, const mat3& b)
-    {
-        return vec3
-        {
-            a.x * b[0].x + a.y * b[1].x + a.z * b[2].x,
-            a.x * b[0].y + a.y * b[1].y + a.z * b[2].y,
-            a.x * b[0].z + a.y * b[1].z + a.z * b[2].z
+            b.x * a[0].x + b.y * a[1].x + b.z * a[2].x,
+            b.x * a[0].y + b.y * a[1].y + b.z * a[2].y,
+            b.x * a[0].z + b.y * a[1].z + b.z * a[2].z
         };
     }
 
@@ -389,6 +379,16 @@ namespace fast
         };
     }
 
+    constexpr inline vec4 operator*(const mat4& a, const vec4& b)
+    {
+        return vec4
+        {
+            b.x * a[0].x + b.y * a[1].x + b.z * a[2].x + b.w * a[3].x,
+            b.x * a[0].y + b.y * a[1].y + b.z * a[2].y + b.w * a[3].y,
+            b.x * a[0].z + b.y * a[1].z + b.z * a[2].z + b.w * a[3].z,
+            b.x * a[0].w + b.y * a[1].w + b.z * a[2].w + b.w * a[3].w
+        };
+    }
 
     //
     // trig functions
@@ -441,6 +441,33 @@ namespace fast
         return (k >= .0f)? vec3(eta * I - (eta * NdotI + sqrtf(k)) * N) : vec3();
     }
 
+    constexpr inline float determinant(const mat3& m)
+    {
+        return (+ m[0][0] * (m[1][1] * m[2][2] - m[2][1] * m[1][2])
+                - m[1][0] * (m[0][1] * m[2][2] - m[2][1] * m[0][2])
+                + m[2][0] * (m[0][1] * m[1][2] - m[1][1] * m[0][2]));
+    }
+
+    constexpr inline mat3 inverse(const mat3& m)
+    {
+        const float one_over_det = 1.f / determinant(m);
+
+        mat3 inverse;
+        inverse[0][0] = + (m[1][1] * m[2][2] - m[2][1] * m[1][2]) * one_over_det;
+        inverse[1][0] = - (m[1][0] * m[2][2] - m[2][0] * m[1][2]) * one_over_det;
+        inverse[2][0] = + (m[1][0] * m[2][1] - m[2][0] * m[1][1]) * one_over_det;
+
+        inverse[0][1] = - (m[0][1] * m[2][2] - m[2][1] * m[0][2]) * one_over_det;
+        inverse[1][1] = + (m[0][0] * m[2][2] - m[2][0] * m[0][2]) * one_over_det;
+        inverse[2][1] = - (m[0][0] * m[2][1] - m[2][0] * m[0][1]) * one_over_det;
+
+        inverse[0][2] = + (m[0][1] * m[1][2] - m[1][1] * m[0][2]) * one_over_det;
+        inverse[1][2] = - (m[0][0] * m[1][2] - m[1][0] * m[0][2]) * one_over_det;
+        inverse[2][2] = + (m[0][0] * m[1][1] - m[1][0] * m[0][1]) * one_over_det;
+
+        return inverse;
+    }
+
     constexpr inline mat4 translate(const mat4& m, const vec3& v)
     {
         return mat4
@@ -486,29 +513,27 @@ namespace fast
     inline mat4 lookAt(const vec3& eye, const vec3& center, const vec3& up)
     {
         const vec3 f(normalize(center - eye));
-        const vec3 s(normalize(cross(up, f)));
-        const vec3 u(cross(f, s));
+        const vec3 s(normalize(cross(f, up)));
+        const vec3 u(cross(s, f));
 
         return mat4
         {
-            vec4{          s.x,          u.x,          f.x,  0.0f },
-            vec4{          s.y,          u.y,          f.y,  0.0f },
-            vec4{          s.z,          u.z,          f.z,  0.0f },
-            vec4{ -dot(s, eye), -dot(u, eye), -dot(f, eye),  1.0f }
+            vec4{          s.x,          u.x,          -f.x,  0.0f },
+            vec4{          s.y,          u.y,          -f.y,  0.0f },
+            vec4{          s.z,          u.z,          -f.z,  0.0f },
+            vec4{ -dot(s, eye), -dot(u, eye),   dot(f, eye),  1.0f }
         };
     }
 
     inline mat4 perspective(float fovy, float aspect, float znear, float zfar)
     {
-        const float F = cot(fovy / 2.0f);
-        const float delta = zfar - znear;
-
+        const float f = cot(fovy / 2.0f);
         return mat4
         {
-            vec4{ F / aspect,   0.0f,                           0.0f,  0.0f },
-            vec4{       0.0f,      F,                           0.0f,  0.0f },
-            vec4{       0.0f,   0.0f,         (zfar + znear) / delta,  1.0f },
-            vec4{       0.0f,   0.0f, -(2.0f * zfar * znear) / delta,  0.0f }
+            vec4{ f / aspect,  0.0f,                                   0.0f,   0.0f },
+            vec4{       0.0f,     f,                                   0.0f,   0.0f },
+            vec4{       0.0f,  0.0f,      - (zfar + znear) / (zfar - znear),  -1.0f },
+            vec4{       0.0f,  0.0f,  -(2.f *zfar * znear) / (zfar - znear),   0.0f }
         };
     }
 }
