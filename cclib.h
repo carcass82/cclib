@@ -73,8 +73,8 @@ namespace fast
         
     inline float rsqrt(float x)
     {
-        float rsqrt_tmp = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(x)));
-        return rsqrt_tmp * (1.5f - x * 0.5f * rsqrt_tmp * rsqrt_tmp);
+        __m128 rroot = _mm_rsqrt_ss(_mm_load_ss(&x));
+        return *((float*)&rroot);
     }
 
     constexpr inline float atan2f(float y, float x)
