@@ -468,6 +468,63 @@ namespace fast
         return inverse;
     }
 
+	constexpr inline mat4 inverse(const mat4& m)
+	{
+		float coef00 = m[2][2] * m[3][3] - m[3][2] * m[2][3];
+		float coef02 = m[2][2] * m[3][3] - m[3][2] * m[2][3];
+		float coef03 = m[1][2] * m[2][3] - m[2][2] * m[1][3];
+
+		float coef04 = m[2][1] * m[3][3] - m[3][1] * m[2][3];
+		float coef06 = m[1][1] * m[3][3] - m[3][1] * m[1][3];
+		float coef07 = m[1][1] * m[2][3] - m[2][1] * m[1][3];
+
+		float coef08 = m[2][1] * m[3][2] - m[3][1] * m[2][2];
+		float coef10 = m[1][1] * m[3][2] - m[3][1] * m[1][2];
+		float coef11 = m[1][1] * m[2][2] - m[2][1] * m[1][2];
+
+		float coef12 = m[2][0] * m[3][3] - m[3][0] * m[2][3];
+		float coef14 = m[1][0] * m[3][3] - m[3][0] * m[1][3];
+		float coef15 = m[1][0] * m[2][3] - m[2][0] * m[1][3];
+
+		float coef16 = m[2][0] * m[3][2] - m[3][0] * m[2][2];
+		float coef18 = m[1][0] * m[3][2] - m[3][0] * m[1][2];
+		float coef19 = m[1][0] * m[2][2] - m[2][0] * m[1][2];
+
+		float coef20 = m[2][0] * m[3][1] - m[3][0] * m[2][1];
+		float coef22 = m[1][0] * m[3][1] - m[3][0] * m[1][1];
+		float coef23 = m[1][0] * m[2][1] - m[2][0] * m[1][1];
+
+		vec4 fac0(coef00, coef00, coef02, coef03);
+		vec4 fac1(coef04, coef04, coef06, coef07);
+		vec4 fac2(coef08, coef08, coef10, coef11);
+		vec4 fac3(coef12, coef12, coef14, coef15);
+		vec4 fac4(coef16, coef16, coef18, coef19);
+		vec4 fac5(coef20, coef20, coef22, coef23);
+
+		vec4 vec0(m[1][0], m[0][0], m[0][0], m[0][0]);
+		vec4 vec1(m[1][1], m[0][1], m[0][1], m[0][1]);
+		vec4 vec2(m[1][2], m[0][2], m[0][2], m[0][2]);
+		vec4 vec3(m[1][3], m[0][3], m[0][3], m[0][3]);
+
+		vec4 inv0(vec1 * fac0 - vec2 * fac1 + vec3 * fac2);
+		vec4 inv1(vec0 * fac0 - vec2 * fac3 + vec3 * fac4);
+		vec4 inv2(vec0 * fac1 - vec1 * fac3 + vec3 * fac5);
+		vec4 inv3(vec0 * fac2 - vec1 * fac4 + vec2 * fac5);
+
+		vec4 sign_a(+1, -1, +1, -1);
+		vec4 sign_b(-1, +1, -1, +1);
+
+		mat4 inv{ inv0 * sign_a, inv1 * sign_b, inv2 * sign_a, inv3 * sign_b };
+		
+		vec4 row0(inv[0][0], inv[1][0], inv[2][0], inv[3][0]);
+
+		vec4 dot0(m[0] * row0);
+		float dot1 = (dot0.x + dot0.y) + (dot0.z + dot0.w);
+		float one_over_det = 1.f / dot1;
+
+		return mat4{ inv[0] * one_over_det, inv[1] * one_over_det, inv[2] * one_over_det, inv[3] * one_over_det };
+	}
+
     constexpr inline mat4 translate(const mat4& m, const vec3& v)
     {
         return mat4
