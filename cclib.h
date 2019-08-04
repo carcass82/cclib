@@ -166,7 +166,7 @@ namespace fast
     constexpr inline float degrees(float rad)                { return rad * 180.0f / PI; }
     
     template<typename T>
-    constexpr inline T lerp(const T& v0, const T& v1, float t) { return v0 * t + v1 * (1.f - t); }
+    constexpr inline T lerp(const T& v0, const T& v1, float t) { return v0 + t * (v1 - v0); }
 
 
     // cotangent
@@ -226,6 +226,8 @@ namespace fast
         constexpr inline explicit vec4(float _v) : v{_v, _v, _v, _v} {}
         constexpr inline explicit vec4(float _v1, float _v2, float _v3, float _v4) : v{ _v1, _v2, _v3, _v4 } {}
         constexpr inline explicit vec4(std::initializer_list<float> _v) : v{*_v.begin(), *(_v.begin() + 1), *(_v.begin() + 2), *(_v.begin() + 3)} { assert(_v.size() == 4); }
+
+		constexpr inline vec4(const vec3& _vec, float _v) : v{_vec.x, _vec.y, _vec.z, _v} {}
     };
 
     struct mat4
@@ -390,6 +392,17 @@ namespace fast
         };
     }
 
+	constexpr inline vec4 operator*(const vec4& a, const mat4& b)
+	{
+		return vec4
+		{
+			b[0].x * a.x + b[0].y * a.y + b[0].z * a.z + b[0].w * a.w,
+			b[1].x * a.x + b[1].y * a.y + b[1].z * a.z + b[1].w * a.w,
+			b[2].x * a.x + b[2].y * a.y + b[2].z * a.z + b[2].w * a.w,
+			b[3].x * a.x + b[3].y * a.y + b[3].z * a.z + b[3].w * a.w
+		};
+	}
+
     //
     // trig functions
     //
@@ -471,7 +484,7 @@ namespace fast
 	constexpr inline mat4 inverse(const mat4& m)
 	{
 		float coef00 = m[2][2] * m[3][3] - m[3][2] * m[2][3];
-		float coef02 = m[2][2] * m[3][3] - m[3][2] * m[2][3];
+		float coef02 = m[1][2] * m[3][3] - m[3][2] * m[1][3];
 		float coef03 = m[1][2] * m[2][3] - m[2][2] * m[1][3];
 
 		float coef04 = m[2][1] * m[3][3] - m[3][1] * m[2][3];
@@ -585,12 +598,12 @@ namespace fast
     inline mat4 perspective(float fovy, float aspect, float znear, float zfar)
     {
         const float f = cot(fovy / 2.0f);
-        return mat4
+		return mat4
         {
-            vec4{ f / aspect,  0.0f,                                   0.0f,   0.0f },
-            vec4{       0.0f,     f,                                   0.0f,   0.0f },
-            vec4{       0.0f,  0.0f,      - (zfar + znear) / (zfar - znear),  -1.0f },
-            vec4{       0.0f,  0.0f,  -(2.f *zfar * znear) / (zfar - znear),   0.0f }
+            vec4{ f / aspect,  0.0f,                                    0.0f,   0.0f },
+            vec4{       0.0f,     f,                                    0.0f,   0.0f },
+            vec4{       0.0f,  0.0f,        -(zfar + znear) / (zfar - znear),  -1.0f },
+            vec4{       0.0f,  0.0f,  -(2.f * zfar * znear) / (zfar - znear),   0.0f }
         };
     }
 }

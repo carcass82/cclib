@@ -245,6 +245,13 @@ int main()
 			glm::inverse(glm::mat3(glm_P_V))[i].x, glm::inverse(glm::mat3(glm_P_V))[i].y, glm::inverse(glm::mat3(glm_P_V))[i].z,
 			cc::math::inverse(cc::math::mat3(cc_P_V))[i].x, cc::math::inverse(cc::math::mat3(cc_P_V))[i].y, cc::math::inverse(cc::math::mat3(cc_P_V))[i].z);
 	printf("\n");
+    
+    printf("inverse(mat4): GLM                            CC\n");
+	for (int i = 0; i < 4; ++i)
+		printf("               [%+06.2f %+06.2f %+06.2f %+06.2f]  [%+06.2f %+06.2f %+06.2f %+06.2f]\n",
+			glm::inverse(glm::mat4(glm_P_V))[i].x, glm::inverse(glm::mat4(glm_P_V))[i].y, glm::inverse(glm::mat4(glm_P_V))[i].z, glm::inverse(glm::mat4(glm_P_V))[i].w,
+			cc::math::inverse(cc::math::mat4(cc_P_V))[i].x, cc::math::inverse(cc::math::mat4(cc_P_V))[i].y, cc::math::inverse(cc::math::mat4(cc_P_V))[i].z, cc::math::inverse(cc::math::mat4(cc_P_V))[i].w);
+	printf("\n");
 #endif
 
 	return 0;
