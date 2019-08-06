@@ -73,7 +73,7 @@ namespace fast
 		return 1.f / x;
     }
         
-    constexpr inline float rsqrt(float x)
+    /* constexpr */ inline float rsqrt(float x)
     {
         //__m128 rroot = _mm_rsqrt_ss(_mm_load_ss(&x));
         //return *((float*)&rroot);
@@ -81,7 +81,7 @@ namespace fast
 		return rcp(sqrtf(x));
     }
 
-    constexpr inline float atan2f(float y, float x)
+    /* constexpr */ inline float atan2f(float y, float x)
     {
         constexpr float c1 = PI / 4.f;
         constexpr float c2 = PI * 3.f / 4.f;
