@@ -4,8 +4,6 @@ matrix:
   include:
     - os: linux
       compiler: gcc
-    - os: linux
-      compiler: clang
     - os: windows
 
 addons:
@@ -17,8 +15,7 @@ addons:
       - cmake
 
 script:
-  - if [[ "$TRAVIS_OS_NAME" != "windows" && "$CXX" != "clang++" ]]; then export CXX=g++-8 ; fi
-  
+  - if [[ "$TRAVIS_OS_NAME" != "windows" ]]; then export CXX=g++-8 ; fi
   - if [[ "$TRAVIS_OS_NAME" != "windows" ]]; then cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release . ; fi
   - if [[ "$TRAVIS_OS_NAME" != "windows" ]]; then cmake --build . ; fi
   - if [[ "$TRAVIS_OS_NAME" != "windows" ]]; then ./CCBenchmark ; fi
