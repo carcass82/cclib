@@ -66,15 +66,19 @@ namespace fast
     //
     // (hopefully) faster but less accurate implementations than stdlib
     //
-    inline float rcp(float x)
+	constexpr inline float rcp(float x)
     {
-        return _mm_cvtss_f32(_mm_rcp_ss(_mm_set_ss(x)));
+        //return _mm_cvtss_f32(_mm_rcp_ss(_mm_load_ss(&x)));
+
+		return 1.f / x;
     }
         
-    inline float rsqrt(float x)
+    constexpr inline float rsqrt(float x)
     {
-        __m128 rroot = _mm_rsqrt_ss(_mm_load_ss(&x));
-        return *((float*)&rroot);
+        //__m128 rroot = _mm_rsqrt_ss(_mm_load_ss(&x));
+        //return *((float*)&rroot);
+
+		return rcp(sqrtf(x));
     }
 
     constexpr inline float atan2f(float y, float x)
@@ -83,7 +87,6 @@ namespace fast
         constexpr float c2 = PI * 3.f / 4.f;
 
         float result = .0f;
-        if (y != 0 || x != 0)
         {
             float angle = (x >= .0f)? c1 - c1 * ((x - fabsf(y)) / (x + fabsf(y))) :
                                       c2 - c1 * ((x + fabsf(y)) / (fabsf(y) - x));
@@ -597,7 +600,7 @@ namespace fast
 
     inline mat4 perspective(float fovy, float aspect, float znear, float zfar)
     {
-        const float f = cot(fovy / 2.0f);
+        const float f = fast::rcp(tanf(fovy / 2.0f));
 		return mat4
         {
             vec4{ f / aspect,  0.0f,                                    0.0f,   0.0f },

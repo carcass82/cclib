@@ -6,6 +6,7 @@ matrix:
       compiler: gcc
     - os: linux
       compiler: clang
+    - os: windows
 
 addons:
   apt:
@@ -13,13 +14,17 @@ addons:
       - ubuntu-toolchain-r-test
     packages:
       - g++-8
+      - cmake
 
 script:
   - cd benchmark
 
   - if [[ "$TRAVIS_OS_NAME" != "windows" && "$CXX" != "clang++" ]]; then export CXX=g++-8 ; fi
-  - if [[ "$TRAVIS_OS_NAME" != "windows" ]]; then $CXX benchmark.cpp -std=c++1z -Ofast -march=native -fno-rtti -funroll-loops -obenchmark ; fi
-
-  - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then "C:/Program Files (x86)/Microsoft Visual Studio/2017/BuildTools/VC/Tools/MSVC/14.16.27023/bin/Hostx86/x64/cl.exe" /DNDEBUG /GR- /GL /Gs- /O2 /fp:fast /fp:except- benchmark.cpp /link /LTCG /INCREMENTAL:NO /OPT:REF ; fi
-
-  - ./benchmark
+  
+  - if [[ "$TRAVIS_OS_NAME" != "windows" ]]; then cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release . ; fi
+  - if [[ "$TRAVIS_OS_NAME" != "windows" ]]; then cmake --build . ; fi
+  - if [[ "$TRAVIS_OS_NAME" != "windows" ]]; then ./CCBenchmark
+  
+  - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then cmake -G "Visual Studio 15 2017 Win64" ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then cmake --build . -- -property:Configuration=Release ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then ./Release/CCBenchmark.exe
