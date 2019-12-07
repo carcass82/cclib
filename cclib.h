@@ -191,10 +191,10 @@ namespace fast
         constexpr inline float& operator[](size_t i)             { assert(i < 2); return v[i]; }
         constexpr inline const float& operator[](size_t i) const { assert(i < 2); return v[i]; }
 
-        constexpr inline vec2() : v{} {}
-        constexpr inline explicit vec2(float _v) : v{_v, _v} {}
-        constexpr inline explicit vec2(float _v1, float _v2) : v{ _v1, _v2 } {}
-        constexpr inline explicit vec2(std::initializer_list<float> _v) : v{*_v.begin(), *(_v.begin() + 1)} { assert(_v.size() == 2); }
+        constexpr inline vec2() noexcept : v{} {}
+        constexpr inline explicit vec2(float _v) noexcept : v{_v, _v} {}
+        constexpr inline explicit vec2(float _v1, float _v2) noexcept : v{ _v1, _v2 } {}
+        constexpr inline explicit vec2(std::initializer_list<float> _v) noexcept : v{*_v.begin(), *(_v.begin() + 1)} { assert(_v.size() == 2); }
     };
 
     struct vec3
@@ -208,10 +208,10 @@ namespace fast
         constexpr inline float& operator[](size_t i)             { assert(i < 3); return v[i]; }
         constexpr inline const float& operator[](size_t i) const { assert(i < 3); return v[i]; }
 
-        constexpr inline vec3() : v{} {}
-        constexpr inline explicit vec3(float _v) : v{_v, _v, _v} {}
-        constexpr inline explicit vec3(float _v1, float _v2, float _v3) : v{ _v1, _v2, _v3 } {}
-        constexpr inline explicit vec3(std::initializer_list<float> _v) : v{*_v.begin(), *(_v.begin() + 1), *(_v.begin() + 2)} { assert(_v.size() == 3); }
+        constexpr inline vec3() noexcept : v{} {}
+        constexpr inline explicit vec3(float _v) noexcept : v{_v, _v, _v} {}
+        constexpr inline explicit vec3(float _v1, float _v2, float _v3) noexcept : v{ _v1, _v2, _v3 } {}
+        constexpr inline explicit vec3(std::initializer_list<float> _v) noexcept : v{*_v.begin(), *(_v.begin() + 1), *(_v.begin() + 2)} { assert(_v.size() == 3); }
     };
 
     struct vec4
@@ -225,10 +225,10 @@ namespace fast
         constexpr inline float& operator[](size_t i)             { assert(i < 4); return v[i]; }
         constexpr inline const float& operator[](size_t i) const { assert(i < 4); return v[i]; }
 
-        constexpr inline vec4() : v{} {}
-        constexpr inline explicit vec4(float _v) : v{_v, _v, _v, _v} {}
-        constexpr inline explicit vec4(float _v1, float _v2, float _v3, float _v4) : v{ _v1, _v2, _v3, _v4 } {}
-        constexpr inline explicit vec4(std::initializer_list<float> _v) : v{*_v.begin(), *(_v.begin() + 1), *(_v.begin() + 2), *(_v.begin() + 3)} { assert(_v.size() == 4); }
+        constexpr inline vec4() noexcept : v{} {}
+        constexpr inline explicit vec4(float _v) noexcept : v{_v, _v, _v, _v} {}
+        constexpr inline explicit vec4(float _v1, float _v2, float _v3, float _v4) noexcept : v{ _v1, _v2, _v3, _v4 } {}
+        constexpr inline explicit vec4(std::initializer_list<float> _v) noexcept : v{*_v.begin(), *(_v.begin() + 1), *(_v.begin() + 2), *(_v.begin() + 3)} { assert(_v.size() == 4); }
 
 		constexpr inline vec4(const vec3& _vec, float _v) : v{_vec.x, _vec.y, _vec.z, _v} {}
     };
@@ -248,9 +248,9 @@ namespace fast
         constexpr vec4& operator[](size_t i)             { assert(i < 4); return m[i]; }
         constexpr const vec4& operator[](size_t i) const { assert(i < 4); return m[i]; }
 
-        constexpr inline mat4() : m{} {}
-        constexpr inline explicit mat4(float _i) : m{} { _m00 = _m11 =_m22 = _m33 = _i; }
-        constexpr inline explicit mat4(std::initializer_list<vec4> _m) : m{*_m.begin(), *(_m.begin() + 1), *(_m.begin() + 2), *(_m.begin() + 3)} { assert(_m.size() == 4); }
+        constexpr inline mat4() noexcept : m{} {}
+        constexpr inline explicit mat4(float _i) noexcept : m{} { _m00 = _m11 =_m22 = _m33 = _i; }
+        constexpr inline explicit mat4(std::initializer_list<vec4> _m) noexcept : m{*_m.begin(), *(_m.begin() + 1), *(_m.begin() + 2), *(_m.begin() + 3)} { assert(_m.size() == 4); }
     };
 
     struct mat3
@@ -267,9 +267,9 @@ namespace fast
         constexpr vec3& operator[](size_t i)             { assert(i < 3); return m[i]; }
         constexpr const vec3& operator[](size_t i) const { assert(i < 3); return m[i]; }
 
-        constexpr inline mat3() : m{} {}
-        constexpr inline explicit mat3(float _i) : m{} { _m00 = _m11 =_m22 = _i; }
-        constexpr inline explicit mat3(const mat4& _m) : _m00(_m._m00), _m10(_m._m10), _m20(_m._m20), _m01(_m._m01), _m11(_m._m11), _m21(_m._m21), _m02(_m._m02), _m12(_m._m12), _m22(_m._m22) {}
+        constexpr inline mat3() noexcept : m{} {}
+        constexpr inline explicit mat3(float _i) noexcept : m{} { _m00 = _m11 =_m22 = _i; }
+        constexpr inline explicit mat3(const mat4& _m) noexcept : _m00(_m._m00), _m10(_m._m10), _m20(_m._m20), _m01(_m._m01), _m11(_m._m11), _m21(_m._m21), _m02(_m._m02), _m12(_m._m12), _m22(_m._m22) {}
         constexpr inline explicit mat3(std::initializer_list<vec3> _m) : m{*_m.begin(), *(_m.begin() + 1), *(_m.begin() + 2)} { assert(_m.size() == 3); }
     };
 
@@ -304,6 +304,8 @@ namespace fast
     constexpr inline vec2& operator/=(vec2& a, float b)                      { a.x /= b; a.y /= b; return a; }
     constexpr inline bool operator==(const vec2& a, const vec2& b)           { return util::abs(a.x - b.x) < EPS && util::abs(a.y - b.y) < EPS; }
     constexpr inline bool operator!=(const vec2& a, const vec2& b)           { return !(a == b); }
+    constexpr inline vec2 pmax(const vec2& a, const vec2& b)                 { return vec2{ util::max(a.x, b.x), util::max(a.y, b.y) }; }
+    constexpr inline vec2 pmin(const vec2& a, const vec2& b)                 { return vec2{ util::min(a.x, b.x), util::min(a.y, b.y) }; }
 
     constexpr inline vec3 operator+(const vec3& a, float b)                  { return vec3{ a.x + b, a.y + b, a.z + b }; }
     constexpr inline vec3 operator+(float b, const vec3& a)                  { return vec3{ a.x + b, a.y + b, a.z + b }; }
@@ -328,6 +330,8 @@ namespace fast
     constexpr inline vec3& operator/=(vec3& a, float b)                      { a.x /= b; a.y /= b; a.z /= b; return a; }
     constexpr inline bool operator==(const vec3& a, const vec3& b)           { return util::abs(a.x - b.x) < EPS && util::abs(a.y - b.y) < EPS && util::abs(a.z - b.z) < EPS; }
     constexpr inline bool operator!=(const vec3& a, const vec3& b)           { return !(a == b); }
+    constexpr inline vec3 pmax(const vec3& a, const vec3& b)                 { return vec3{ util::max(a.x, b.x), util::max(a.y, b.y), util::max(a.z, b.z) }; }
+    constexpr inline vec3 pmin(const vec3& a, const vec3& b)                 { return vec3{ util::min(a.x, b.x), util::min(a.y, b.y), util::min(a.z, b.z) }; }
 
     constexpr inline vec4 operator+(const vec4& a, float b)                  { return vec4{ a.x + b, a.y + b, a.z + b, a.w + b }; }
     constexpr inline vec4 operator+(float b, const vec4& a)                  { return vec4{ a.x + b, a.y + b, a.z + b, a.w + b }; }
@@ -352,6 +356,8 @@ namespace fast
     constexpr inline vec4& operator/=(vec4& a, float b)                      { a.x /= b; a.y /= b; a.z /= b; a.w /= b; return a; }
     constexpr inline bool operator==(const vec4& a, const vec4& b)           { return util::abs(a.x - b.x) < EPS && util::abs(a.y - b.y) < EPS && util::abs(a.z - b.z) < EPS && util::abs(a.w - b.w) < EPS; }
     constexpr inline bool operator!=(const vec4& a, const vec4& b)           { return !(a == b); }
+    constexpr inline vec4 pmax(const vec4& a, const vec4& b)                 { return vec4{ util::max(a.x, b.x), util::max(a.y, b.y), util::max(a.z, b.z), util::max(a.w, b.w) }; }
+    constexpr inline vec4 pmin(const vec4& a, const vec4& b)                 { return vec4{ util::min(a.x, b.x), util::min(a.y, b.y), util::min(a.z, b.z), util::min(a.w, b.w) }; }
 
     constexpr inline mat3 operator*(const mat3& a, const mat3& b)
     {
