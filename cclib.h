@@ -201,8 +201,8 @@ namespace fast
     {
         union {
             float v[3];
-            struct { float x, y, z; }; struct { float xy[2], z; }; struct { float x, yz[2]; }; struct { float xyz[3]; };
-            struct { float r, g, b; }; struct { float rg[2], b; }; struct { float r, gb[2]; }; struct { float rgb[3]; };
+            struct { float x, y, z; }; struct { float xy[2], z0; }; struct { float x0, yz[2]; }; struct { float xyz[3]; };
+            struct { float r, g, b; }; struct { float rg[2], b0; }; struct { float r0, gb[2]; }; struct { float rgb[3]; };
         };
 
         constexpr inline float& operator[](size_t i)             { assert(i < 3); return v[i]; }
@@ -220,8 +220,8 @@ namespace fast
     {
         union {
             float v[4];
-            struct { float x, y, z, w; }; struct { float xy[2], z, w; }; struct { float x, y, zw[2]; }; struct { float xyz[3], w; }; struct { float x, yzw[3]; }; struct { float xyzw[4]; };
-            struct { float r, g, b, a; }; struct { float rg[2], b, a; }; struct { float r, g, ba[2]; }; struct { float rgb[3], a; }; struct { float r, gba[3]; }; struct { float rgba[4]; };
+            struct { float x, y, z, w; }; struct { float xy[2], z0, w0; }; struct { float x0, y0, zw[2]; }; struct { float xyz[3], w1; }; struct { float x1, yzw[3]; }; struct { float xyzw[4]; };
+            struct { float r, g, b, a; }; struct { float rg[2], b0, a0; }; struct { float r0, g0, ba[2]; }; struct { float rgb[3], a1; }; struct { float r1, gba[3]; }; struct { float rgba[4]; };
         };
 
         constexpr inline float& operator[](size_t i)             { assert(i < 4); return v[i]; }
