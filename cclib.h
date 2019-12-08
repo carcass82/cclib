@@ -81,15 +81,15 @@ namespace fast
 		return rcp(sqrtf(x));
     }
 
-    /* constexpr */ inline float atan2f(float y, float x)
+    constexpr inline float atan2f(float y, float x)
     {
         constexpr float c1 = PI / 4.f;
         constexpr float c2 = PI * 3.f / 4.f;
 
         float result = .0f;
         {
-            float angle = (x >= .0f)? c1 - c1 * ((x - fabsf(y)) / (x + fabsf(y))) :
-                                      c2 - c1 * ((x + fabsf(y)) / (fabsf(y) - x));
+            float angle = (x >= .0f)? c1 - c1 * ((x - util::abs(y)) / (x + util::abs(y))) :
+                                      c2 - c1 * ((x + util::abs(y)) / (util::abs(y) - x));
             
             result = (y < .0f)? -angle : angle;
         }
@@ -183,54 +183,57 @@ namespace fast
     {
         union {
             float v[2];
-            struct { float x, y; };
-            struct { float s, t; };
-            struct { float w, h; };
+            struct { float x, y; }; struct { float xy[2]; };
+            struct { float s, t; }; struct { float st[2]; };
+            struct { float w, h; }; struct { float wh[2]; };
         };
 
         constexpr inline float& operator[](size_t i)             { assert(i < 2); return v[i]; }
         constexpr inline const float& operator[](size_t i) const { assert(i < 2); return v[i]; }
 
-        constexpr inline vec2() noexcept : v{} {}
-        constexpr inline explicit vec2(float _v) noexcept : v{_v, _v} {}
-        constexpr inline explicit vec2(float _v1, float _v2) noexcept : v{ _v1, _v2 } {}
-        constexpr inline explicit vec2(std::initializer_list<float> _v) noexcept : v{*_v.begin(), *(_v.begin() + 1)} { assert(_v.size() == 2); }
+        constexpr inline vec2() noexcept                     : v{} {}
+        constexpr inline vec2(float _v) noexcept             : v{_v, _v} {}
+        constexpr inline vec2(float _v1, float _v2) noexcept : v{ _v1, _v2 } {}
+        constexpr inline vec2(float _v[2]) noexcept          : v{ _v[0], _v[1] } {}
     };
 
     struct vec3
     {
         union {
             float v[3];
-            struct { float x, y, z; };
-            struct { float r, g, b; };
+            struct { float x, y, z; }; struct { float xy[2], z; }; struct { float x, yz[2]; }; struct { float xyz[3]; };
+            struct { float r, g, b; }; struct { float rg[2], b; }; struct { float r, gb[2]; }; struct { float rgb[3]; };
         };
 
         constexpr inline float& operator[](size_t i)             { assert(i < 3); return v[i]; }
         constexpr inline const float& operator[](size_t i) const { assert(i < 3); return v[i]; }
 
-        constexpr inline vec3() noexcept : v{} {}
-        constexpr inline explicit vec3(float _v) noexcept : v{_v, _v, _v} {}
-        constexpr inline explicit vec3(float _v1, float _v2, float _v3) noexcept : v{ _v1, _v2, _v3 } {}
-        constexpr inline explicit vec3(std::initializer_list<float> _v) noexcept : v{*_v.begin(), *(_v.begin() + 1), *(_v.begin() + 2)} { assert(_v.size() == 3); }
+        constexpr inline vec3() noexcept                                : v{} {}
+        constexpr inline vec3(float _v) noexcept                        : v{_v, _v, _v} {}
+        constexpr inline vec3(float _v1, float _v2, float _v3) noexcept : v{ _v1, _v2, _v3 } {}
+        constexpr inline vec3(const float _v[3]) noexcept               : v{ _v[0], _v[1], _v[2] } {}
+        constexpr inline vec3(const vec2& _vec, float _v) noexcept      : v{ _vec.x, _vec.y, _v } {}
+        constexpr inline vec3(float _v, const vec2& _vec) noexcept      : v{ _v, _vec.x, _vec.y } {}
     };
 
     struct vec4
     {
         union {
             float v[4];
-            struct { float x, y, z, w; };
-            struct { float r, g, b, a; };
+            struct { float x, y, z, w; }; struct { float xy[2], z, w; }; struct { float x, y, zw[2]; }; struct { float xyz[3], w; }; struct { float x, yzw[3]; }; struct { float xyzw[4]; };
+            struct { float r, g, b, a; }; struct { float rg[2], b, a; }; struct { float r, g, ba[2]; }; struct { float rgb[3], a; }; struct { float r, gba[3]; }; struct { float rgba[4]; };
         };
 
         constexpr inline float& operator[](size_t i)             { assert(i < 4); return v[i]; }
         constexpr inline const float& operator[](size_t i) const { assert(i < 4); return v[i]; }
 
-        constexpr inline vec4() noexcept : v{} {}
-        constexpr inline explicit vec4(float _v) noexcept : v{_v, _v, _v, _v} {}
-        constexpr inline explicit vec4(float _v1, float _v2, float _v3, float _v4) noexcept : v{ _v1, _v2, _v3, _v4 } {}
-        constexpr inline explicit vec4(std::initializer_list<float> _v) noexcept : v{*_v.begin(), *(_v.begin() + 1), *(_v.begin() + 2), *(_v.begin() + 3)} { assert(_v.size() == 4); }
-
-		constexpr inline vec4(const vec3& _vec, float _v) : v{_vec.x, _vec.y, _vec.z, _v} {}
+        constexpr inline vec4() noexcept                                           : v{} {}
+        constexpr inline vec4(float _v) noexcept                                   : v{_v, _v, _v, _v} {}
+        constexpr inline vec4(float _v1, float _v2, float _v3, float _v4) noexcept : v{ _v1, _v2, _v3, _v4 } {}
+        constexpr inline vec4(const float _v[4]) noexcept                          : v{ _v[0], _v[1], _v[2], _v[3] } {}
+        constexpr inline vec4(const vec2& _vec1, const vec2& _vec2) noexcept       : v{ _vec1.x, _vec1.y, _vec2.x, _vec2.y } {}
+		constexpr inline vec4(const vec3& _vec, float _v) noexcept                 : v{_vec.x, _vec.y, _vec.z, _v} {}
+        constexpr inline vec4(float _v, const vec3& _vec) noexcept                 : v{ _v, _vec.x, _vec.y, _vec.z } {}
     };
 
     struct mat4
@@ -249,8 +252,8 @@ namespace fast
         constexpr const vec4& operator[](size_t i) const { assert(i < 4); return m[i]; }
 
         constexpr inline mat4() noexcept : m{} {}
-        constexpr inline explicit mat4(float _i) noexcept : m{} { _m00 = _m11 =_m22 = _m33 = _i; }
-        constexpr inline explicit mat4(std::initializer_list<vec4> _m) noexcept : m{*_m.begin(), *(_m.begin() + 1), *(_m.begin() + 2), *(_m.begin() + 3)} { assert(_m.size() == 4); }
+        constexpr inline explicit mat4(float _i) noexcept : m{} { _m00 = _m11 = _m22 = _m33 = _i; }
+        constexpr inline explicit mat4(const vec4& v0, const vec4& v1, const vec4& v2, const vec4& v3) noexcept : m{ v0, v1, v2, v3 } {}
     };
 
     struct mat3
@@ -268,9 +271,9 @@ namespace fast
         constexpr const vec3& operator[](size_t i) const { assert(i < 3); return m[i]; }
 
         constexpr inline mat3() noexcept : m{} {}
-        constexpr inline explicit mat3(float _i) noexcept : m{} { _m00 = _m11 =_m22 = _i; }
-        constexpr inline explicit mat3(const mat4& _m) noexcept : _m00(_m._m00), _m10(_m._m10), _m20(_m._m20), _m01(_m._m01), _m11(_m._m11), _m21(_m._m21), _m02(_m._m02), _m12(_m._m12), _m22(_m._m22) {}
-        constexpr inline explicit mat3(std::initializer_list<vec3> _m) : m{*_m.begin(), *(_m.begin() + 1), *(_m.begin() + 2)} { assert(_m.size() == 3); }
+        constexpr inline explicit mat3(float _i) noexcept : m{} { _m00 = _m11 = _m22 = _i; }
+        constexpr inline explicit mat3(const vec3& v0, const vec3& v1, const vec3& v2) noexcept : m{ v0, v1, v2 } {}
+        constexpr inline explicit mat3(const mat4& _m) noexcept : m{ _m[0].xyz, _m[1].xyz, _m[2].xyz } {}
     };
 
     //
