@@ -194,7 +194,7 @@ namespace fast
         constexpr inline vec2() noexcept                     : v{} {}
         constexpr inline vec2(float _v) noexcept             : v{_v, _v} {}
         constexpr inline vec2(float _v1, float _v2) noexcept : v{ _v1, _v2 } {}
-        constexpr inline vec2(float _v[2]) noexcept          : v{ _v[0], _v[1] } {}
+        constexpr inline vec2(const float _v[2]) noexcept    : v{ _v[0], _v[1] } {}
     };
 
     struct vec3
