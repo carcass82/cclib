@@ -20,6 +20,12 @@
  #include <x86intrin.h>
 #endif
 
+#if defined(__CUDACC__)
+ #define CUDA_CALL __device__
+#else
+ #define CUDA_CALL
+#endif
+
 namespace cc
 {
 namespace util
@@ -28,13 +34,13 @@ namespace util
     // useful functions
     //
     template<typename T>
-    constexpr inline const T& min(const T& a, const T& b) { return !(b < a)? a : b; }
+    CUDA_CALL constexpr inline const T& min(const T& a, const T& b) { return !(b < a)? a : b; }
 
     template<typename T>
-    constexpr inline const T& max(const T& a, const T& b) { return (a < b)? b : a; }
+    CUDA_CALL constexpr inline const T& max(const T& a, const T& b) { return (a < b)? b : a; }
 
     template<typename T>
-    constexpr inline const T& clamp(const T& a, const T& lower, const T& upper) { return util::min(util::max(a, lower), upper); }
+    CUDA_CALL constexpr inline const T& clamp(const T& a, const T& lower, const T& upper) { return util::min(util::max(a, lower), upper); }
 
     template<typename T>
     constexpr inline const T& saturate(const T& a) { return clamp(a, T(0), T(1)); }
@@ -63,9 +69,6 @@ namespace math
 
 namespace fast
 {
-    //
-    // (hopefully) faster but less accurate implementations than stdlib
-    //
 	constexpr inline float rcp(float x)
     {
 		return 1.f / x;
@@ -73,23 +76,12 @@ namespace fast
         
     /* constexpr */ inline float rsqrt(float x)
     {
-		return rcp(sqrtf(x));
+		return rcp(::sqrtf(x));
     }
 
-    constexpr inline float atan2f(float y, float x)
+    /* constexpr */ inline float atan2f(float y, float x)
     {
-        constexpr float c1 = PI / 4.f;
-        constexpr float c2 = PI * 3.f / 4.f;
-
-        float result = .0f;
-        {
-            float angle = (x >= .0f)? c1 - c1 * ((x - util::abs(y)) / (x + util::abs(y))) :
-                                      c2 - c1 * ((x + util::abs(y)) / (util::abs(y) - x));
-            
-            result = (y < .0f)? -angle : angle;
-        }
-
-        return result;
+        return ::atan2f(y, x);
     }
 
     /* constexpr */ inline float sinf(float x)
@@ -101,8 +93,17 @@ namespace fast
     {
         return ::cosf(x);
     }
-}
 
+    /* constexpr */ inline float tanf(float x)
+    {
+        return ::tanf(x);
+    }
+
+    /* constexpr */ inline float cotf(float x)
+    {
+        return rcp(tanf(x));
+    }
+}
 
     //
     // conversion utils
@@ -112,11 +113,6 @@ namespace fast
     
     template<typename T>
     constexpr inline T lerp(const T& v0, const T& v1, float t) { return v0 + t * (v1 - v0); }
-
-
-    // cotangent
-    /* constexpr */ inline float cot(float x) { return fast::cosf(x) / fast::sinf(x); }
-
 
     //
     // useful types
@@ -249,8 +245,8 @@ namespace fast
     constexpr inline vec2& operator/=(vec2& a, float b)                      { a.x /= b; a.y /= b; return a; }
     constexpr inline bool operator==(const vec2& a, const vec2& b)           { return util::abs(a.x - b.x) < EPS && util::abs(a.y - b.y) < EPS; }
     constexpr inline bool operator!=(const vec2& a, const vec2& b)           { return !(a == b); }
-    constexpr inline vec2 pmax(const vec2& a, const vec2& b)                 { return vec2{ util::max(a.x, b.x), util::max(a.y, b.y) }; }
-    constexpr inline vec2 pmin(const vec2& a, const vec2& b)                 { return vec2{ util::min(a.x, b.x), util::min(a.y, b.y) }; }
+    CUDA_CALL constexpr inline vec2 pmax(const vec2& a, const vec2& b)   { return vec2{ util::max(a.x, b.x), util::max(a.y, b.y) }; }
+    CUDA_CALL constexpr inline vec2 pmin(const vec2& a, const vec2& b)   { return vec2{ util::min(a.x, b.x), util::min(a.y, b.y) }; }
 
     constexpr inline vec3 operator+(const vec3& a, float b)                  { return vec3{ a.x + b, a.y + b, a.z + b }; }
     constexpr inline vec3 operator+(float b, const vec3& a)                  { return vec3{ a.x + b, a.y + b, a.z + b }; }
@@ -275,8 +271,8 @@ namespace fast
     constexpr inline vec3& operator/=(vec3& a, float b)                      { a.x /= b; a.y /= b; a.z /= b; return a; }
     constexpr inline bool operator==(const vec3& a, const vec3& b)           { return util::abs(a.x - b.x) < EPS && util::abs(a.y - b.y) < EPS && util::abs(a.z - b.z) < EPS; }
     constexpr inline bool operator!=(const vec3& a, const vec3& b)           { return !(a == b); }
-    constexpr inline vec3 pmax(const vec3& a, const vec3& b)                 { return vec3{ util::max(a.x, b.x), util::max(a.y, b.y), util::max(a.z, b.z) }; }
-    constexpr inline vec3 pmin(const vec3& a, const vec3& b)                 { return vec3{ util::min(a.x, b.x), util::min(a.y, b.y), util::min(a.z, b.z) }; }
+    CUDA_CALL constexpr inline vec3 pmax(const vec3& a, const vec3& b)   { return vec3{ util::max(a.x, b.x), util::max(a.y, b.y), util::max(a.z, b.z) }; }
+    CUDA_CALL constexpr inline vec3 pmin(const vec3& a, const vec3& b)   { return vec3{ util::min(a.x, b.x), util::min(a.y, b.y), util::min(a.z, b.z) }; }
 
     constexpr inline vec4 operator+(const vec4& a, float b)                  { return vec4{ a.x + b, a.y + b, a.z + b, a.w + b }; }
     constexpr inline vec4 operator+(float b, const vec4& a)                  { return vec4{ a.x + b, a.y + b, a.z + b, a.w + b }; }
@@ -301,8 +297,8 @@ namespace fast
     constexpr inline vec4& operator/=(vec4& a, float b)                      { a.x /= b; a.y /= b; a.z /= b; a.w /= b; return a; }
     constexpr inline bool operator==(const vec4& a, const vec4& b)           { return util::abs(a.x - b.x) < EPS && util::abs(a.y - b.y) < EPS && util::abs(a.z - b.z) < EPS && util::abs(a.w - b.w) < EPS; }
     constexpr inline bool operator!=(const vec4& a, const vec4& b)           { return !(a == b); }
-    constexpr inline vec4 pmax(const vec4& a, const vec4& b)                 { return vec4{ util::max(a.x, b.x), util::max(a.y, b.y), util::max(a.z, b.z), util::max(a.w, b.w) }; }
-    constexpr inline vec4 pmin(const vec4& a, const vec4& b)                 { return vec4{ util::min(a.x, b.x), util::min(a.y, b.y), util::min(a.z, b.z), util::min(a.w, b.w) }; }
+    CUDA_CALL constexpr inline vec4 pmax(const vec4& a, const vec4& b)   { return vec4{ util::max(a.x, b.x), util::max(a.y, b.y), util::max(a.z, b.z), util::max(a.w, b.w) }; }
+    CUDA_CALL constexpr inline vec4 pmin(const vec4& a, const vec4& b)   { return vec4{ util::min(a.x, b.x), util::min(a.y, b.y), util::min(a.z, b.z), util::min(a.w, b.w) }; }
 
     constexpr inline mat3 operator*(const mat3& a, const mat3& b)
     {
@@ -551,7 +547,7 @@ namespace fast
 
     inline mat4 perspective(float fovy, float aspect, float znear, float zfar)
     {
-        const float f = fast::rcp(tanf(fovy / 2.0f));
+        const float f = fast::rcp(fast::tanf(fovy / 2.0f));
 		return mat4
         {
             vec4{ f / aspect,  0.0f,                                    0.0f,   0.0f },
