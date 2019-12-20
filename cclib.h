@@ -19,11 +19,10 @@
  #include <x86intrin.h>
 #endif
 
-#if defined(__CUDACC__)
- #define CUDA_CALL __host__ __device__
-#else
+#if !defined(CUDA_CALL)
  #define CUDA_CALL
 #endif
+
 
 namespace cc
 {
