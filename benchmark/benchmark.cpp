@@ -25,7 +25,7 @@ void test_atan2(float* values, float* avg_cc, float* avg_std, float* rmse)
 	
 	high_resolution_clock::time_point t0 = high_resolution_clock::now();
 	
-	for (int i = 0; i < TESTNUM; ++i) { res_cclib[i] = cc::math::fast::atan2f(values[i], values[TESTNUM - i]); }
+	for (int i = 0; i < TESTNUM; ++i) { res_cclib[i] = cc::math::atan2f(values[i], values[TESTNUM - i]); }
 	
 	high_resolution_clock::time_point t1 = high_resolution_clock::now();
 	
@@ -53,7 +53,7 @@ void test_rcp(float* values, float* avg_cc, float* avg_std, float* rmse)
 	
 	high_resolution_clock::time_point t0 = high_resolution_clock::now();
 	
-	for (int i = 0; i < TESTNUM; ++i) { res_cclib[i] = cc::math::fast::rcp(values[i]); }
+	for (int i = 0; i < TESTNUM; ++i) { res_cclib[i] = cc::math::rcp(values[i]); }
 	
 	high_resolution_clock::time_point t1 = high_resolution_clock::now();
 	
@@ -81,7 +81,7 @@ void test_rsqrt(float* values, float* avg_cc, float* avg_std, float* rmse)
 	
 	high_resolution_clock::time_point t0 = high_resolution_clock::now();
 	
-	for (int i = 0; i < TESTNUM; ++i) { res_cclib[i] = cc::math::fast::rsqrt(values[i]); }
+	for (int i = 0; i < TESTNUM; ++i) { res_cclib[i] = cc::math::rsqrt(values[i]); }
 	
 	high_resolution_clock::time_point t1 = high_resolution_clock::now();
 	
@@ -109,7 +109,7 @@ void test_sin(float* values, float* avg_cc, float* avg_std, float* rmse)
 	
 	high_resolution_clock::time_point t0 = high_resolution_clock::now();
 	
-	for (int i = 0; i < TESTNUM; ++i) { res_cclib[i] = cc::math::fast::sinf(values[i]); }
+	for (int i = 0; i < TESTNUM; ++i) { res_cclib[i] = cc::math::sinf(values[i]); }
 	
 	high_resolution_clock::time_point t1 = high_resolution_clock::now();
 	
@@ -137,7 +137,7 @@ void test_cos(float* values, float* avg_cc, float* avg_std, float* rmse)
 	
 	high_resolution_clock::time_point t0 = high_resolution_clock::now();
 	
-	for (int i = 0; i < TESTNUM; ++i) { res_cclib[i] = cc::math::fast::cosf(values[i]); }
+	for (int i = 0; i < TESTNUM; ++i) { res_cclib[i] = cc::math::cosf(values[i]); }
 	
 	high_resolution_clock::time_point t1 = high_resolution_clock::now();
 	
