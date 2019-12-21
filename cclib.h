@@ -70,7 +70,16 @@ namespace math
     template<typename T>
     CUDA_DEVICE_CALL constexpr inline T abs(const T& a) { return (a < T(0)) ? -a : a; }
 
+    template<typename T>
+    CUDA_DEVICE_CALL constexpr inline T lerp(const T v0, const T v1, float t) { return v0 + t * (v1 - v0); }
+
 #if defined(__CUDACC__)
+
+    template<>
+    CUDA_DEVICE_CALL inline float lerp(float v0, float v1, float t)
+    {
+        return __fmaf_ru(t, v1, __fmaf_ru(-t, v0, v0));
+    }
 
     template<>
     CUDA_DEVICE_CALL inline float saturate(const float& a)
@@ -85,12 +94,12 @@ namespace math
 
     __device__ inline float sqrtf(float x)
     {
-        return __fsqrt_rz(x);
+        return __fsqrt_ru(x);
     }
 
     __device__ inline float rcp(float x)
     {
-        return __frcp_rz(x);
+        return __frcp_ru(x);
     }
 
     __device__ inline float rsqrt(float x)
@@ -168,9 +177,6 @@ namespace math
     CUDA_DEVICE_CALL constexpr inline float radians(float deg)                  { return deg * PI / 180.0f; }
 
     CUDA_DEVICE_CALL constexpr inline float degrees(float rad)                  { return rad * 180.0f / PI; }
-    
-    template<typename T>
-    CUDA_DEVICE_CALL constexpr inline T lerp(const T& v0, const T& v1, float t) { return v0 + t * (v1 - v0); }
 
     //
     // useful types
