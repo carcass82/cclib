@@ -117,6 +117,11 @@ namespace math
         return __cosf(x);
     }
 
+    __device__ inline void sincosf(float x, float* s, float* c)
+    {
+        return __sincosf(x, s, c);
+    }
+
     __device__ inline float tanf(float x)
     {
         return __tanf(x);
@@ -152,6 +157,12 @@ namespace math
     CUDA_DEVICE_CALL /* constexpr */ inline float cosf(float x)
     {
         return ::cosf(x);
+    }
+
+    CUDA_DEVICE_CALL /* constexpr */ inline void sincosf(float x, float* s, float* c)
+    {
+        *s = sinf(x);
+        *c = cosf(x);
     }
 
     CUDA_DEVICE_CALL /* constexpr */ inline float tanf(float x)
