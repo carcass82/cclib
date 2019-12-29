@@ -18,14 +18,6 @@
  #include <x86intrin.h>
 #endif
 
-#if defined(min)
- #undef(min)
-#endif
-
-#if defined(max)
- #undef(max)
-#endif
-
 #if !defined(CUDA_DEVICE_CALL)
  #define CUDA_DEVICE_CALL
 #endif
@@ -72,6 +64,13 @@ namespace math
 
     template<typename T>
     CUDA_DEVICE_CALL constexpr inline T lerp(const T v0, const T v1, float t) { return v0 + t * (v1 - v0); }
+
+    template<typename T>
+    CUDA_DEVICE_CALL constexpr inline bool are_equal(const T a, const T b) { return a == b; }
+
+    // float comparison, see http://realtimecollisiondetection.net/pubs/Tolerances/
+    template<>
+    CUDA_DEVICE_CALL constexpr inline bool are_equal(const float a, const float b) { return abs(a - b) <= EPS * max(max(1.f, abs(a)), abs(b)); }
 
 #if defined(__CUDACC__)
 
@@ -351,7 +350,7 @@ namespace math
     CUDA_DEVICE_CALL constexpr inline vec2& operator-=(vec2& a, float b)                      { a.x -= b; a.y -= b; return a; }
     CUDA_DEVICE_CALL constexpr inline vec2& operator*=(vec2& a, float b)                      { a.x *= b; a.y *= b; return a; }
     CUDA_DEVICE_CALL constexpr inline vec2& operator/=(vec2& a, float b)                      { a.x /= b; a.y /= b; return a; }
-    CUDA_DEVICE_CALL constexpr inline bool operator==(const vec2& a, const vec2& b)           { return abs(a.x - b.x) < EPS && abs(a.y - b.y) < EPS; }
+    CUDA_DEVICE_CALL constexpr inline bool operator==(const vec2& a, const vec2& b)           { return are_equal(a.x, b.x) && are_equal(a.y, b.y); }
     CUDA_DEVICE_CALL constexpr inline bool operator!=(const vec2& a, const vec2& b)           { return !(a == b); }
     CUDA_DEVICE_CALL constexpr inline vec2 pmax(const vec2& a, const vec2& b)                 { return vec2{ max(a.x, b.x), max(a.y, b.y) }; }
     CUDA_DEVICE_CALL constexpr inline vec2 pmin(const vec2& a, const vec2& b)                 { return vec2{ min(a.x, b.x), min(a.y, b.y) }; }
@@ -377,7 +376,7 @@ namespace math
     CUDA_DEVICE_CALL constexpr inline vec3& operator-=(vec3& a, float b)                      { a.x -= b; a.y -= b; a.z -= b; return a; }
     CUDA_DEVICE_CALL constexpr inline vec3& operator*=(vec3& a, float b)                      { a.x *= b; a.y *= b; a.z *= b; return a; }
     CUDA_DEVICE_CALL constexpr inline vec3& operator/=(vec3& a, float b)                      { a.x /= b; a.y /= b; a.z /= b; return a; }
-    CUDA_DEVICE_CALL constexpr inline bool operator==(const vec3& a, const vec3& b)           { return abs(a.x - b.x) < EPS && abs(a.y - b.y) < EPS && abs(a.z - b.z) < EPS; }
+    CUDA_DEVICE_CALL constexpr inline bool operator==(const vec3& a, const vec3& b)           { return are_equal(a.x, b.x) && are_equal(a.y, b.y) && are_equal(a.z, b.z); }
     CUDA_DEVICE_CALL constexpr inline bool operator!=(const vec3& a, const vec3& b)           { return !(a == b); }
     CUDA_DEVICE_CALL constexpr inline vec3 pmax(const vec3& a, const vec3& b)                 { return vec3{ max(a.x, b.x), max(a.y, b.y), max(a.z, b.z) }; }
     CUDA_DEVICE_CALL constexpr inline vec3 pmin(const vec3& a, const vec3& b)                 { return vec3{ min(a.x, b.x), min(a.y, b.y), min(a.z, b.z) }; }
@@ -403,7 +402,7 @@ namespace math
     CUDA_DEVICE_CALL constexpr inline vec4& operator-=(vec4& a, float b)                      { a.x -= b; a.y -= b; a.z -= b; a.w -= b; return a; }
     CUDA_DEVICE_CALL constexpr inline vec4& operator*=(vec4& a, float b)                      { a.x *= b; a.y *= b; a.z *= b; a.w *= b; return a; }
     CUDA_DEVICE_CALL constexpr inline vec4& operator/=(vec4& a, float b)                      { a.x /= b; a.y /= b; a.z /= b; a.w /= b; return a; }
-    CUDA_DEVICE_CALL constexpr inline bool operator==(const vec4& a, const vec4& b)           { return abs(a.x - b.x) < EPS && abs(a.y - b.y) < EPS && abs(a.z - b.z) < EPS && abs(a.w - b.w) < EPS; }
+    CUDA_DEVICE_CALL constexpr inline bool operator==(const vec4& a, const vec4& b)           { return are_equal(a.x, b.x) && are_equal(a.y, b.y) && are_equal(a.z, b.z) && are_equal(a.w, b.w); }
     CUDA_DEVICE_CALL constexpr inline bool operator!=(const vec4& a, const vec4& b)           { return !(a == b); }
     CUDA_DEVICE_CALL constexpr inline vec4 pmax(const vec4& a, const vec4& b)                 { return vec4{ max(a.x, b.x), max(a.y, b.y), max(a.z, b.z), max(a.w, b.w) }; }
     CUDA_DEVICE_CALL constexpr inline vec4 pmin(const vec4& a, const vec4& b)                 { return vec4{ min(a.x, b.x), min(a.y, b.y), min(a.z, b.z), min(a.w, b.w) }; }
