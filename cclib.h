@@ -72,21 +72,28 @@ namespace math
     template<>
     CUDA_DEVICE_CALL constexpr inline bool are_equal(const float a, const float b) { return abs(a - b) <= EPS * max(max(1.f, abs(a)), abs(b)); }
 
+    template<typename T>
+    CUDA_DEVICE_CALL constexpr inline T pow(const T x, const T y)
+    {
+        return (y == T(0)) ? T(1) : x * pow(x, y - T(1));
+    }
+
 #if defined(__CUDACC__)
 
     template<>
-    CUDA_DEVICE_CALL inline float lerp(float v0, float v1, float t)
+    __device__ inline float lerp(float v0, float v1, float t)
     {
         return __fmaf_ru(t, v1, __fmaf_ru(-t, v0, v0));
     }
 
     template<>
-    CUDA_DEVICE_CALL inline float saturate(const float& a)
+    __device__ inline float saturate(const float& a)
     {
         return __saturatef(a);
     }
 
-    __device__ inline float powf(float x, float y)
+    template<>
+    __device__ inline float pow(float x, float y)
     {
         return __powf(x, y);
     }
@@ -127,11 +134,6 @@ namespace math
     }
 
 #else
-
-    CUDA_DEVICE_CALL /* constexpr */ inline float powf(float x, float y)
-    {
-        return ::powf(x, y);
-    }
 
     CUDA_DEVICE_CALL /* constexpr */ inline float sqrtf(float x)
     {
