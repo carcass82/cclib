@@ -18,11 +18,11 @@
  #include <x86intrin.h>
 #endif
 
-#if !defined(CUDA_DEVICE_CALL)
+#if defined(__CUDACC__)
+ #define CUDA_DEVICE_CALL __device__
+ #define CUDA_CALL __host__ __device__
+#else
  #define CUDA_DEVICE_CALL
-#endif
-
-#if !defined(CUDA_CALL)
  #define CUDA_CALL
 #endif
 
@@ -78,63 +78,6 @@ namespace math
         return (y == T(0)) ? T(1) : x * pow(x, y - T(1));
     }
 
-#if 0 && defined(__CUDACC__)
-
-    template<>
-    __device__ inline float lerp(float v0, float v1, float t)
-    {
-        return __fmaf_ru(t, v1, __fmaf_ru(-t, v0, v0));
-    }
-
-    template<>
-    __device__ inline float saturate(const float& a)
-    {
-        return __saturatef(a);
-    }
-
-    template<>
-    __device__ inline float pow(float x, float y)
-    {
-        return __powf(x, y);
-    }
-
-    __device__ inline float sqrtf(float x)
-    {
-        return __fsqrt_ru(x);
-    }
-
-    __device__ inline float rcp(float x)
-    {
-        return __frcp_ru(x);
-    }
-
-    __device__ inline float rsqrt(float x)
-    {
-        return __frsqrt_rn(x);
-    }
-
-    __device__ inline float sinf(float x)
-    {
-        return __sinf(x);
-    }
-
-    __device__ inline float cosf(float x)
-    {
-        return __cosf(x);
-    }
-
-    __device__ inline void sincosf(float x, float* s, float* c)
-    {
-        return __sincosf(x, s, c);
-    }
-
-    __device__ inline float tanf(float x)
-    {
-        return __tanf(x);
-    }
-
-#else
-
     CUDA_CALL /* constexpr */ inline float sqrtf(float x)
     {
         return ::sqrtf(x);
@@ -171,8 +114,6 @@ namespace math
         return ::tanf(x);
     }
 
-#endif
-
     CUDA_CALL /* constexpr */ inline float atan2f(float y, float x)
     {
         return ::atan2f(y, x);
@@ -193,7 +134,7 @@ namespace math
     //
     // useful types
     //
-    struct alignas(8) vec2
+    struct vec2
     {
         union {
             float v[2];
@@ -217,7 +158,7 @@ namespace math
         CUDA_CALL constexpr inline vec2(const float _v[2]) noexcept    : v{ _v[0], _v[1] } {}
     };
 
-    struct alignas(16) vec3
+    struct vec3
     {
         union {
             float v[3];
@@ -272,7 +213,7 @@ namespace math
         CUDA_CALL constexpr inline vec4(float _v, const vec3& _vec) noexcept                 : v{ _v, _vec.x, _vec.y, _vec.z } {}
     };
 
-    struct alignas(16) mat4
+    struct alignas(64) mat4
     {
         union {
             vec4 m[4];
