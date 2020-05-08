@@ -26,6 +26,11 @@
  #define CUDA_CALL
 #endif
 
+#if !defined(CC_CONSTEXPR_MATH)
+ #define CC_CONSTEXPR
+#else
+ #define CC_CONSTEXPR constexpr
+#endif
 
 namespace cc
 {
@@ -72,13 +77,12 @@ namespace math
     template<>
     CUDA_CALL constexpr inline bool are_equal(const float a, const float b) { return abs(a - b) <= EPS * max(max(1.f, abs(a)), abs(b)); }
 
-    template<typename T>
-    CUDA_CALL constexpr inline T pow(const T x, const T y)
+    CUDA_CALL CC_CONSTEXPR inline float pow(float x, float y)
     {
-        return (y == T(0)) ? T(1) : x * pow(x, y - T(1));
+        return ::powf(x, y);
     }
 
-    CUDA_CALL /* constexpr */ inline float sqrtf(float x)
+    CUDA_CALL CC_CONSTEXPR inline float sqrtf(float x)
     {
         return ::sqrtf(x);
     }
@@ -88,38 +92,38 @@ namespace math
 		return 1.f / x;
     }
         
-    CUDA_CALL /* constexpr */ inline float rsqrt(float x)
+    CUDA_CALL CC_CONSTEXPR inline float rsqrt(float x)
     {
 		return rcp(sqrtf(x));
     }
 
-    CUDA_CALL /* constexpr */ inline float sinf(float x)
+    CUDA_CALL CC_CONSTEXPR inline float sinf(float x)
     {
         return ::sinf(x);
     }
 
-    CUDA_CALL /* constexpr */ inline float cosf(float x)
+    CUDA_CALL CC_CONSTEXPR inline float cosf(float x)
     {
         return ::cosf(x);
     }
 
-    CUDA_CALL /* constexpr */ inline void sincosf(float x, float* s, float* c)
+    CUDA_CALL CC_CONSTEXPR inline void sincosf(float x, float* s, float* c)
     {
         *s = sinf(x);
         *c = cosf(x);
     }
 
-    CUDA_CALL /* constexpr */ inline float tanf(float x)
+    CUDA_CALL CC_CONSTEXPR inline float tanf(float x)
     {
         return ::tanf(x);
     }
 
-    CUDA_CALL /* constexpr */ inline float atan2f(float y, float x)
+    CUDA_CALL CC_CONSTEXPR inline float atan2f(float y, float x)
     {
         return ::atan2f(y, x);
     }
 
-    CUDA_CALL /* constexpr */ inline float cotf(float x)
+    CUDA_CALL CC_CONSTEXPR inline float cotf(float x)
     {
         return rcp(tanf(x));
     }
@@ -416,7 +420,7 @@ namespace math
         return dot(a, a);
     }
 
-    CUDA_CALL inline float length(const vec3& a)
+    CUDA_CALL CC_CONSTEXPR inline float length(const vec3& a)
     {
         return sqrtf(length2(a));
     }
@@ -426,7 +430,7 @@ namespace math
         return (a.x - b.x) * (a.x - b.x) - (a.y - b.y) * (a.y - b.y) - (a.z - b.z) * (a.z - b.z);
     }
 
-    CUDA_CALL inline float distance(const vec3& a, const vec3& b)
+    CUDA_CALL CC_CONSTEXPR inline float distance(const vec3& a, const vec3& b)
     {
         return sqrtf(distance2(a, b));
     }
@@ -436,7 +440,7 @@ namespace math
         return vec3{ a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x };
     }
 
-    CUDA_CALL inline vec3 normalize(const vec3& a)
+    CUDA_CALL CC_CONSTEXPR inline vec3 normalize(const vec3& a)
     {
         return a / length(a);
     }
@@ -549,7 +553,7 @@ namespace math
         };
     }
 
-    CUDA_CALL inline mat4 rotate(const mat4& m, float angle, const vec3& axis)
+    CUDA_CALL CC_CONSTEXPR inline mat4 rotate(const mat4& m, float angle, const vec3& axis)
     {
         const vec3 axis_n = normalize(axis);
         const float x = axis_n.x;
@@ -580,7 +584,7 @@ namespace math
         };
     }
 
-    CUDA_CALL inline mat4 lookAt(const vec3& eye, const vec3& center, const vec3& up)
+    CUDA_CALL CC_CONSTEXPR inline mat4 lookAt(const vec3& eye, const vec3& center, const vec3& up)
     {
         const vec3 f(normalize(center - eye));
         const vec3 s(normalize(cross(f, up)));
@@ -595,7 +599,7 @@ namespace math
         };
     }
 
-    CUDA_CALL inline mat4 perspective(float fovy, float aspect, float znear, float zfar)
+    CUDA_CALL CC_CONSTEXPR inline mat4 perspective(float fovy, float aspect, float znear, float zfar)
     {
         const float f = rcp(tanf(fovy / 2.0f));
 		return mat4
@@ -606,5 +610,29 @@ namespace math
             vec4{       0.0f,  0.0f,  -(2.f * zfar * znear) / (zfar - znear),   0.0f }
         };
     }
+}
+
+namespace gfx
+{
+using math::vec3;
+using math::vec4;
+using math::pow;
+
+CUDA_CALL CC_CONSTEXPR inline float srgb(float linear)
+{
+    return (linear <= 0.0031308f)? 12.92f * linear : 1.055f * pow(linear, 1.f / 2.4f) - 0.055f;
+}
+
+CUDA_CALL CC_CONSTEXPR inline float linear(float srgb)
+{
+    return (srgb <= 0.04045f) ? srgb / 12.92f : pow((srgb + 0.055f) / 1.055f, 2.4f);
+}
+
+CUDA_CALL CC_CONSTEXPR inline vec3 srgb(const vec3& linear)   { return vec3(srgb(linear.r), srgb(linear.g), srgb(linear.b)); }
+CUDA_CALL CC_CONSTEXPR inline vec4 srgb(const vec4& linear)   { return vec4(srgb(vec3(linear.rgb)), linear.a); }
+
+CUDA_CALL CC_CONSTEXPR inline vec3 linear(const vec3& srgb)   { return vec3(linear(srgb.r), linear(srgb.g), linear(srgb.b)); }
+CUDA_CALL CC_CONSTEXPR inline vec4 linear(const vec4& srgb)   { return vec4(linear(vec3(srgb.rgb)), srgb.a); }
+
 }
 }
