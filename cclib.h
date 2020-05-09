@@ -408,6 +408,46 @@ namespace math
 	}
 
     //
+    // useful specializations
+    //
+    template<>
+    CUDA_CALL constexpr inline vec2 clamp(const vec2& a, const vec2& lower, const vec2& upper)
+    {
+        return { clamp(a.x, lower.x, upper.x), clamp(a.y, lower.y, upper.y) };
+    }
+
+    template<>
+    CUDA_CALL constexpr inline vec2 saturate(const vec2& a)
+    {
+        return { saturate(a.x), saturate(a.y) };
+    }
+
+    template<>
+    CUDA_CALL constexpr inline vec3 clamp(const vec3& a, const vec3& lower, const vec3& upper)
+    {
+        return { clamp(a.x, lower.x, upper.x), clamp(a.y, lower.y, upper.y), clamp(a.z, lower.z, upper.z) };
+    }
+
+    template<>
+    CUDA_CALL constexpr inline vec3 saturate(const vec3& a)
+    {
+        return { saturate(a.x), saturate(a.y), saturate(a.z) };
+    }
+
+    template<>
+    CUDA_CALL constexpr inline vec4 clamp(const vec4& a, const vec4& lower, const vec4& upper)
+    {
+        return { clamp(a.x, lower.x, upper.x), clamp(a.y, lower.y, upper.y), clamp(a.z, lower.z, upper.z), clamp(a.w, lower.w, upper.w) };
+    }
+
+    template<>
+    CUDA_CALL constexpr inline vec4 saturate(const vec4& a)
+    {
+        return { saturate(a.x), saturate(a.y), saturate(a.z), saturate(a.w) };
+    }
+    
+
+    //
     // trig functions
     //
     CUDA_CALL constexpr inline float dot(const vec3& a, const vec3& b)
