@@ -354,6 +354,11 @@ namespace math
     CUDA_CALL constexpr inline vec4 pmax(const vec4& a, const vec4& b)                 { return vec4{ max(a.x, b.x), max(a.y, b.y), max(a.z, b.z), max(a.w, b.w) }; }
     CUDA_CALL constexpr inline vec4 pmin(const vec4& a, const vec4& b)                 { return vec4{ min(a.x, b.x), min(a.y, b.y), min(a.z, b.z), min(a.w, b.w) }; }
 
+    CUDA_CALL constexpr inline bool operator==(const mat3& a, const mat3& b)           { return a[0] == b[0] && a[1] == b[1] && a[2] == b[2]; }
+    CUDA_CALL constexpr inline bool operator!=(const mat3& a, const mat3& b)           { return !(a == b); }
+    CUDA_CALL constexpr inline bool operator==(const mat4& a, const mat4& b)           { return a[0] == b[0] && a[1] == b[1] && a[2] == b[2] && a[3] == b[3]; }
+    CUDA_CALL constexpr inline bool operator!=(const mat4& a, const mat4& b)           { return !(a == b); }
+
     CUDA_CALL constexpr inline mat3 operator*(const mat3& a, const mat3& b)
     {
         return mat3
