@@ -530,6 +530,24 @@ namespace math
         return inverse;
     }
 
+    CUDA_CALL constexpr inline mat3 transpose(const mat3& m)
+    {
+        mat3 transpose;
+        transpose[0][0] = m[0][0];
+        transpose[0][1] = m[1][0];
+        transpose[0][2] = m[2][0];
+
+        transpose[1][0] = m[0][1];
+        transpose[1][1] = m[1][1];
+        transpose[1][2] = m[2][1];
+
+        transpose[2][0] = m[0][2];
+        transpose[2][1] = m[1][2];
+        transpose[2][2] = m[2][2];
+
+        return transpose;
+    }
+
     CUDA_CALL constexpr inline mat4 inverse(const mat4& m)
 	{
 		float coef00 = m[2][2] * m[3][3] - m[3][2] * m[2][3];
@@ -586,6 +604,32 @@ namespace math
 
 		return mat4{ inv[0] * one_over_det, inv[1] * one_over_det, inv[2] * one_over_det, inv[3] * one_over_det };
 	}
+
+    CUDA_CALL constexpr inline mat4 transpose(const mat4& m)
+    {
+        mat4 transpose;
+        transpose[0][0] = m[0][0];
+        transpose[0][1] = m[1][0];
+        transpose[0][2] = m[2][0];
+        transpose[0][3] = m[3][0];
+
+        transpose[1][0] = m[0][1];
+        transpose[1][1] = m[1][1];
+        transpose[1][2] = m[2][1];
+        transpose[1][3] = m[3][1];
+
+        transpose[2][0] = m[0][2];
+        transpose[2][1] = m[1][2];
+        transpose[2][2] = m[2][2];
+        transpose[2][3] = m[3][2];
+
+        transpose[3][0] = m[0][3];
+        transpose[3][1] = m[1][3];
+        transpose[3][2] = m[2][3];
+        transpose[3][3] = m[3][3];
+
+        return transpose;
+    }
 
     CUDA_CALL constexpr inline mat4 translate(const mat4& m, const vec3& v)
     {
