@@ -379,6 +379,16 @@ namespace math
         };
     }
 
+    CUDA_CALL constexpr inline vec3 operator*(const vec3& a, const mat3& b)
+    {
+        return vec3
+        {
+            b[0].x * a.x + b[0].y * a.y + b[0].z * a.z,
+            b[1].x * a.x + b[1].y * a.y + b[1].z * a.z,
+            b[2].x * a.x + b[2].y * a.y + b[2].z * a.z
+        };
+    }
+
     CUDA_CALL constexpr inline mat4 operator*(const mat4& a, const mat4& b)
     {
         return mat4
