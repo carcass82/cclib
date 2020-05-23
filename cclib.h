@@ -724,4 +724,33 @@ CUDA_CALL CC_CONSTEXPR inline vec3 linear(const vec3& srgb)   { return vec3(line
 CUDA_CALL CC_CONSTEXPR inline vec4 linear(const vec4& srgb)   { return vec4(linear(vec3(srgb.rgb)), srgb.a); }
 
 }
+
+namespace yuv
+{
+using math::vec3;
+
+CUDA_CALL CC_CONSTEXPR inline vec3 yuv(vec3 rgb)
+{
+    vec3 yuv;
+
+    yuv.x = .299f * rgb.r + .587f * rgb.g + .114f * rgb.b;
+    yuv.y = (rgb.b - yuv.x) * .565f;
+    yuv.z = (rgb.r - yuv.x) * .713f;
+
+    return yuv;
+}
+
+CUDA_CALL CC_CONSTEXPR inline vec3 rgb(vec3 yuv)
+{
+    vec3 rgb;
+
+    rgb.r = yuv.x + 1.403f * yuv.z;
+    rgb.g = yuv.x -  .344f * yuv.y - .714f * yuv.z;
+    rgb.b = yuv.x + 1.770f * yuv.y;
+
+    return rgb;
+}
+
+}
+
 }
