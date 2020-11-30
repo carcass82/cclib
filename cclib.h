@@ -733,6 +733,29 @@ CUDA_CALL CC_CONSTEXPR inline vec4 srgb(const vec4& linear)   { return vec4(srgb
 CUDA_CALL CC_CONSTEXPR inline vec3 linear(const vec3& srgb)   { return vec3(linear(srgb.r), linear(srgb.g), linear(srgb.b)); }
 CUDA_CALL CC_CONSTEXPR inline vec4 linear(const vec4& srgb)   { return vec4(linear(vec3(srgb.rgb)), srgb.a); }
 
+CUDA_CALL CC_CONSTEXPR inline float aces(float x)
+{
+    // Narkowicz, "ACES Filmic Tone Mapping Curve"
+    // https://knarkowicz.wordpress.com/2016/01/06/aces-filmic-tone-mapping-curve/
+    constexpr float a = 2.51f;
+    constexpr float b = 0.03f;
+    constexpr float c = 2.43f;
+    constexpr float d = 0.59f;
+    constexpr float e = 0.14f;
+    return (x * (a * x + b)) / (x * (c * x + d) + e);
+}
+
+CUDA_CALL CC_CONSTEXPR inline vec3 aces(const vec3& linear) { return vec3(aces(linear.x), aces(linear.y), aces(linear.z)); }
+CUDA_CALL CC_CONSTEXPR inline vec4 aces(const vec4& linear) { return vec4(aces(linear.x), aces(linear.y), aces(linear.z), linear.a); }
+
+CUDA_CALL CC_CONSTEXPR inline float reinhard(float x)
+{
+    return x / (1.0f + x);
+}
+
+CUDA_CALL CC_CONSTEXPR inline vec3 reinhard(const vec3& linear) { return vec3(reinhard(linear.x), reinhard(linear.y), reinhard(linear.z)); }
+CUDA_CALL CC_CONSTEXPR inline vec4 reinhard(const vec4& linear) { return vec4(reinhard(linear.x), reinhard(linear.y), reinhard(linear.z), linear.a); }
+
 }
 
 namespace yuv
