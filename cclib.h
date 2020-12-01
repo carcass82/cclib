@@ -716,6 +716,7 @@ namespace gfx
 using math::vec3;
 using math::vec4;
 using math::pow;
+using math::saturate;
 
 CUDA_CALL CC_CONSTEXPR inline float srgb(float linear)
 {
@@ -742,7 +743,7 @@ CUDA_CALL CC_CONSTEXPR inline float aces(float x)
     constexpr float c = 2.43f;
     constexpr float d = 0.59f;
     constexpr float e = 0.14f;
-    return (x * (a * x + b)) / (x * (c * x + d) + e);
+    return saturate((x * (a * x + b)) / (x * (c * x + d) + e));
 }
 
 CUDA_CALL CC_CONSTEXPR inline vec3 aces(const vec3& linear) { return vec3(aces(linear.x), aces(linear.y), aces(linear.z)); }
@@ -750,7 +751,7 @@ CUDA_CALL CC_CONSTEXPR inline vec4 aces(const vec4& linear) { return vec4(aces(l
 
 CUDA_CALL CC_CONSTEXPR inline float reinhard(float x)
 {
-    return x / (1.0f + x);
+    return saturate(x / (1.0f + x));
 }
 
 CUDA_CALL CC_CONSTEXPR inline vec3 reinhard(const vec3& linear) { return vec3(reinhard(linear.x), reinhard(linear.y), reinhard(linear.z)); }
