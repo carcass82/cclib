@@ -77,6 +77,8 @@ namespace math
     template<>
     CUDA_CALL constexpr inline bool are_equal(const float a, const float b) { return abs(a - b) <= EPS * max(max(1.f, abs(a)), abs(b)); }
 
+    CUDA_CALL CC_CONSTEXPR inline float frac(float x) { float dummy; return modf(x, &dummy); }
+
     CUDA_CALL CC_CONSTEXPR inline float pow(float x, float y)
     {
         return ::powf(x, y);
@@ -717,6 +719,7 @@ using math::vec3;
 using math::vec4;
 using math::pow;
 using math::saturate;
+using math::sqrtf;
 
 CUDA_CALL CC_CONSTEXPR inline float srgb(float linear)
 {
@@ -728,11 +731,32 @@ CUDA_CALL CC_CONSTEXPR inline float linear(float srgb)
     return (srgb <= 0.04045f) ? srgb / 12.92f : pow((srgb + 0.055f) / 1.055f, 2.4f);
 }
 
-CUDA_CALL CC_CONSTEXPR inline vec3 srgb(const vec3& linear)   { return vec3(srgb(linear.r), srgb(linear.g), srgb(linear.b)); }
-CUDA_CALL CC_CONSTEXPR inline vec4 srgb(const vec4& linear)   { return vec4(srgb(vec3(linear.rgb)), linear.a); }
+CUDA_CALL CC_CONSTEXPR inline vec3 srgb(const vec3& linear) { return vec3(srgb(linear.r), srgb(linear.g), srgb(linear.b)); }
+CUDA_CALL CC_CONSTEXPR inline vec4 srgb(const vec4& linear) { return vec4(srgb(vec3(linear.rgb)), linear.a); }
+CUDA_CALL CC_CONSTEXPR inline vec3 linear(const vec3& srgb) { return vec3(linear(srgb.r), linear(srgb.g), linear(srgb.b)); }
+CUDA_CALL CC_CONSTEXPR inline vec4 linear(const vec4& srgb) { return vec4(linear(vec3(srgb.rgb)), srgb.a); }
 
-CUDA_CALL CC_CONSTEXPR inline vec3 linear(const vec3& srgb)   { return vec3(linear(srgb.r), linear(srgb.g), linear(srgb.b)); }
-CUDA_CALL CC_CONSTEXPR inline vec4 linear(const vec4& srgb)   { return vec4(linear(vec3(srgb.rgb)), srgb.a); }
+
+namespace fast
+{
+// assume gamma = 2 approximation
+
+CUDA_CALL CC_CONSTEXPR inline float srgbfast(float linear)
+{
+    return sqrtf(linear);
+}
+
+CUDA_CALL CC_CONSTEXPR inline float linearfast(float srgb)
+{
+    return srgb * srgb;
+}
+
+CUDA_CALL CC_CONSTEXPR inline vec3 srgbfast(const vec3& linear) { return vec3(srgb(linear.r), srgb(linear.g), srgb(linear.b)); }
+CUDA_CALL CC_CONSTEXPR inline vec4 srgbfast(const vec4& linear) { return vec4(srgb(vec3(linear.rgb)), linear.a); }
+CUDA_CALL CC_CONSTEXPR inline vec3 linearfast(const vec3& srgb) { return vec3(linear(srgb.r), linear(srgb.g), linear(srgb.b)); }
+CUDA_CALL CC_CONSTEXPR inline vec4 linearfast(const vec4& srgb) { return vec4(linear(vec3(srgb.rgb)), srgb.a); }
+}
+
 
 CUDA_CALL CC_CONSTEXPR inline float aces(float x)
 {
@@ -749,6 +773,7 @@ CUDA_CALL CC_CONSTEXPR inline float aces(float x)
 CUDA_CALL CC_CONSTEXPR inline vec3 aces(const vec3& linear) { return vec3(aces(linear.x), aces(linear.y), aces(linear.z)); }
 CUDA_CALL CC_CONSTEXPR inline vec4 aces(const vec4& linear) { return vec4(aces(linear.x), aces(linear.y), aces(linear.z), linear.a); }
 
+
 CUDA_CALL CC_CONSTEXPR inline float reinhard(float x)
 {
     return saturate(x / (1.0f + x));
@@ -756,7 +781,6 @@ CUDA_CALL CC_CONSTEXPR inline float reinhard(float x)
 
 CUDA_CALL CC_CONSTEXPR inline vec3 reinhard(const vec3& linear) { return vec3(reinhard(linear.x), reinhard(linear.y), reinhard(linear.z)); }
 CUDA_CALL CC_CONSTEXPR inline vec4 reinhard(const vec4& linear) { return vec4(reinhard(linear.x), reinhard(linear.y), reinhard(linear.z), linear.a); }
-
 }
 
 namespace yuv
