@@ -77,7 +77,7 @@ namespace math
     template<>
     CUDA_CALL constexpr inline bool are_equal(const float a, const float b) { return abs(a - b) <= EPS * max(max(1.f, abs(a)), abs(b)); }
 
-    CUDA_CALL CC_CONSTEXPR inline float frac(float x) { float dummy; return modf(x, &dummy); }
+    CUDA_CALL CC_CONSTEXPR inline float frac(float x) { float dummy; return modff(x, &dummy); }
 
     CUDA_CALL CC_CONSTEXPR inline float pow(float x, float y)
     {
