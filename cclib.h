@@ -140,7 +140,7 @@ namespace math
     //
     // useful types
     //
-    struct vec2
+    struct alignas(8) vec2
     {
         union {
             float v[2];
@@ -162,6 +162,12 @@ namespace math
         CUDA_CALL constexpr inline vec2(float _v1, float _v2) noexcept : v{ _v1, _v2 } {}
 
         CUDA_CALL constexpr inline vec2(const float _v[2]) noexcept    : v{ _v[0], _v[1] } {}
+    
+#if defined(__CUDACC__)
+        CUDA_CALL constexpr inline vec2(float2 _v) noexcept            : v{ _v.x, _v.y } {}
+
+        CUDA_CALL inline operator float2() const { return make_float2(x, y); }
+#endif
     };
 
     struct vec3
@@ -189,6 +195,12 @@ namespace math
         CUDA_CALL constexpr inline vec3(const vec2& _vec, float _v) noexcept      : v{ _vec.x, _vec.y, _v } {}
 
         CUDA_CALL constexpr inline vec3(float _v, const vec2& _vec) noexcept      : v{ _v, _vec.x, _vec.y } {}
+
+#if defined(__CUDACC__)
+        CUDA_CALL constexpr inline vec3(float3 _v) noexcept                       : v{ _v.x, _v.y, _v.z } {}
+
+        CUDA_CALL inline operator float3() const { return make_float3(x, y, z); }
+#endif
     };
 
     struct alignas(16) vec4
@@ -217,6 +229,12 @@ namespace math
 		CUDA_CALL constexpr inline vec4(const vec3& _vec, float _v) noexcept                 : v{_vec.x, _vec.y, _vec.z, _v} {}
 
         CUDA_CALL constexpr inline vec4(float _v, const vec3& _vec) noexcept                 : v{ _v, _vec.x, _vec.y, _vec.z } {}
+
+#if defined(__CUDACC__)
+        CUDA_CALL constexpr inline vec4(float4 _v) noexcept                                  : v{ _v.x, _v.y, _v.z, _v.w } {}
+
+        CUDA_CALL inline operator float4() const { return make_float4(x, y, z, w); }
+#endif
     };
 
     struct alignas(64) mat4
