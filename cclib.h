@@ -89,7 +89,8 @@ namespace math
         return ::sqrtf(x);
     }
 
-    CUDA_CALL constexpr inline float rcp(float x)
+    template<typename T>
+    CUDA_CALL constexpr inline T rcp(T x)
     {
 		return 1.f / x;
     }
