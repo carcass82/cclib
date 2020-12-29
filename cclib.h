@@ -19,11 +19,21 @@
 #endif
 
 #if defined(__CUDACC__)
- #define CUDA_DEVICE_CALL __device__
- #define CUDA_CALL __host__ __device__
+ #if !defined(CUDA_ANY)
+  #define CUDA_ANY __host__ __device__
+ #endif
+ #if !defined(CUDA_DEVICE)
+  #define CUDA_DEVICE __device__
+ #endif
+ #if !defined(CUDA_HOST)
+  #define CUDA_HOST __host__
+ #endif
+ #define CUDA_CONSTANT __constant__
 #else
- #define CUDA_DEVICE_CALL
- #define CUDA_CALL
+ #define CUDA_ANY
+ #define CUDA_DEVICE
+ #define CUDA_HOST
+ #define CUDA_CONSTANT
 #endif
 
 #if !defined(CC_CONSTEXPR_MATH)
@@ -35,10 +45,10 @@
 namespace cc
 {
     template<typename T, size_t N>
-    CUDA_CALL constexpr inline uint32_t array_size(const T(&)[N]) { return N; }
+    CUDA_ANY constexpr inline uint32_t array_size(const T(&)[N]) { return N; }
 
     template<typename T>
-    CUDA_CALL constexpr inline void swap(T& a, T& b) { T tmp = std::move(a); a = std::move(b); b = std::move(tmp); }
+    CUDA_ANY constexpr inline void swap(T& a, T& b) { T tmp = std::move(a); a = std::move(b); b = std::move(tmp); }
 
 namespace math
 {
@@ -50,83 +60,83 @@ namespace math
     constexpr float EPS = 1.e-8f;
 
     template<typename T>
-    CUDA_CALL constexpr inline T min(const T& a, const T& b) { return !(b < a) ? a : b; }
+    CUDA_ANY constexpr inline T min(const T& a, const T& b) { return !(b < a) ? a : b; }
 
     template<typename T>
-    CUDA_CALL constexpr inline T max(const T& a, const T& b) { return (a < b) ? b : a; }
+    CUDA_ANY constexpr inline T max(const T& a, const T& b) { return (a < b) ? b : a; }
 
     template<typename T>
-    CUDA_CALL constexpr inline T clamp(const T& a, const T& lower, const T& upper) { return min(max(a, lower), upper); }
+    CUDA_ANY constexpr inline T clamp(const T& a, const T& lower, const T& upper) { return min(max(a, lower), upper); }
 
     template<typename T>
-    CUDA_CALL constexpr inline T saturate(const T& a) { return clamp(a, T(0), T(1)); }
+    CUDA_ANY constexpr inline T saturate(const T& a) { return clamp(a, T(0), T(1)); }
 
     template<typename T>
-    CUDA_CALL constexpr inline T sign(const T& x) { return T((x > T(0)) - (x < T(0))); }
+    CUDA_ANY constexpr inline T sign(const T& x) { return T((x > T(0)) - (x < T(0))); }
 
     template<typename T>
-    CUDA_CALL constexpr inline T abs(const T& a) { return (a < T(0)) ? -a : a; }
+    CUDA_ANY constexpr inline T abs(const T& a) { return (a < T(0)) ? -a : a; }
 
     template<typename T>
-    CUDA_CALL constexpr inline T lerp(const T v0, const T v1, float t) { return v0 + t * (v1 - v0); }
+    CUDA_ANY constexpr inline T lerp(const T v0, const T v1, float t) { return v0 + t * (v1 - v0); }
 
     template<typename T>
-    CUDA_CALL constexpr inline bool are_equal(const T a, const T b) { return a == b; }
+    CUDA_ANY constexpr inline bool are_equal(const T a, const T b) { return a == b; }
 
     // float comparison, see http://realtimecollisiondetection.net/pubs/Tolerances/
     template<>
-    CUDA_CALL constexpr inline bool are_equal(const float a, const float b) { return abs(a - b) <= EPS * max(max(1.f, abs(a)), abs(b)); }
+    CUDA_ANY constexpr inline bool are_equal(const float a, const float b) { return abs(a - b) <= EPS * max(max(1.f, abs(a)), abs(b)); }
 
-    CUDA_CALL CC_CONSTEXPR inline float frac(float x) { float dummy; return modff(x, &dummy); }
+    CUDA_ANY CC_CONSTEXPR inline float frac(float x) { float dummy; return modff(x, &dummy); }
 
-    CUDA_CALL CC_CONSTEXPR inline float pow(float x, float y)
+    CUDA_ANY CC_CONSTEXPR inline float pow(float x, float y)
     {
         return ::powf(x, y);
     }
 
-    CUDA_CALL CC_CONSTEXPR inline float sqrtf(float x)
+    CUDA_ANY CC_CONSTEXPR inline float sqrtf(float x)
     {
         return ::sqrtf(x);
     }
 
     template<typename T>
-    CUDA_CALL constexpr inline T rcp(T x)
+    CUDA_ANY constexpr inline T rcp(T x)
     {
 		return 1.f / x;
     }
         
-    CUDA_CALL CC_CONSTEXPR inline float rsqrt(float x)
+    CUDA_ANY CC_CONSTEXPR inline float rsqrt(float x)
     {
 		return rcp(sqrtf(x));
     }
 
-    CUDA_CALL CC_CONSTEXPR inline float sinf(float x)
+    CUDA_ANY CC_CONSTEXPR inline float sinf(float x)
     {
         return ::sinf(x);
     }
 
-    CUDA_CALL CC_CONSTEXPR inline float cosf(float x)
+    CUDA_ANY CC_CONSTEXPR inline float cosf(float x)
     {
         return ::cosf(x);
     }
 
-    CUDA_CALL CC_CONSTEXPR inline void sincosf(float x, float* s, float* c)
+    CUDA_ANY CC_CONSTEXPR inline void sincosf(float x, float* s, float* c)
     {
         *s = sinf(x);
         *c = cosf(x);
     }
 
-    CUDA_CALL CC_CONSTEXPR inline float tanf(float x)
+    CUDA_ANY CC_CONSTEXPR inline float tanf(float x)
     {
         return ::tanf(x);
     }
 
-    CUDA_CALL CC_CONSTEXPR inline float atan2f(float y, float x)
+    CUDA_ANY CC_CONSTEXPR inline float atan2f(float y, float x)
     {
         return ::atan2f(y, x);
     }
 
-    CUDA_CALL CC_CONSTEXPR inline float cotf(float x)
+    CUDA_ANY CC_CONSTEXPR inline float cotf(float x)
     {
         return rcp(tanf(x));
     }
@@ -134,9 +144,9 @@ namespace math
     //
     // conversion utils
     //
-    CUDA_CALL constexpr inline float radians(float deg)                  { return deg * PI / 180.0f; }
+    CUDA_ANY constexpr inline float radians(float deg)                  { return deg * PI / 180.0f; }
 
-    CUDA_CALL constexpr inline float degrees(float rad)                  { return rad * 180.0f / PI; }
+    CUDA_ANY constexpr inline float degrees(float rad)                  { return rad * 180.0f / PI; }
 
     //
     // useful types
@@ -151,23 +161,23 @@ namespace math
         };
 
 
-        CUDA_CALL constexpr inline float& operator[](size_t i)             { return v[i]; }
+        CUDA_ANY constexpr inline float& operator[](size_t i)             { return v[i]; }
 
-        CUDA_CALL constexpr inline const float& operator[](size_t i) const { return v[i]; }
+        CUDA_ANY constexpr inline const float& operator[](size_t i) const { return v[i]; }
 
 
-        CUDA_CALL constexpr inline vec2() noexcept                     : v{} {}
+        CUDA_ANY constexpr inline vec2() noexcept                     : v{} {}
 
-        CUDA_CALL constexpr inline vec2(float _v) noexcept             : v{_v, _v} {}
+        CUDA_ANY constexpr inline vec2(float _v) noexcept             : v{_v, _v} {}
 
-        CUDA_CALL constexpr inline vec2(float _v1, float _v2) noexcept : v{ _v1, _v2 } {}
+        CUDA_ANY constexpr inline vec2(float _v1, float _v2) noexcept : v{ _v1, _v2 } {}
 
-        CUDA_CALL constexpr inline vec2(const float _v[2]) noexcept    : v{ _v[0], _v[1] } {}
+        CUDA_ANY constexpr inline vec2(const float _v[2]) noexcept    : v{ _v[0], _v[1] } {}
     
 #if defined(__CUDACC__)
-        CUDA_CALL constexpr inline vec2(float2 _v) noexcept            : v{ _v.x, _v.y } {}
+        CUDA_ANY constexpr inline vec2(float2 _v) noexcept            : v{ _v.x, _v.y } {}
 
-        CUDA_CALL inline operator float2() const { return make_float2(x, y); }
+        CUDA_ANY inline operator float2() const { return make_float2(x, y); }
 #endif
     };
 
@@ -180,27 +190,27 @@ namespace math
         };
 
 
-        CUDA_CALL constexpr inline float& operator[](size_t i)             { return v[i]; }
+        CUDA_ANY constexpr inline float& operator[](size_t i)             { return v[i]; }
 
-        CUDA_CALL constexpr inline const float& operator[](size_t i) const { return v[i]; }
+        CUDA_ANY constexpr inline const float& operator[](size_t i) const { return v[i]; }
 
 
-        CUDA_CALL constexpr inline vec3() noexcept                                : v{} {}
+        CUDA_ANY constexpr inline vec3() noexcept                                : v{} {}
 
-        CUDA_CALL constexpr inline vec3(float _v) noexcept                        : v{_v, _v, _v} {}
+        CUDA_ANY constexpr inline vec3(float _v) noexcept                        : v{_v, _v, _v} {}
 
-        CUDA_CALL constexpr inline vec3(float _v1, float _v2, float _v3) noexcept : v{ _v1, _v2, _v3 } {}
+        CUDA_ANY constexpr inline vec3(float _v1, float _v2, float _v3) noexcept : v{ _v1, _v2, _v3 } {}
 
-        CUDA_CALL constexpr inline vec3(const float _v[3]) noexcept               : v{ _v[0], _v[1], _v[2] } {}
+        CUDA_ANY constexpr inline vec3(const float _v[3]) noexcept               : v{ _v[0], _v[1], _v[2] } {}
 
-        CUDA_CALL constexpr inline vec3(const vec2& _vec, float _v) noexcept      : v{ _vec.x, _vec.y, _v } {}
+        CUDA_ANY constexpr inline vec3(const vec2& _vec, float _v) noexcept      : v{ _vec.x, _vec.y, _v } {}
 
-        CUDA_CALL constexpr inline vec3(float _v, const vec2& _vec) noexcept      : v{ _v, _vec.x, _vec.y } {}
+        CUDA_ANY constexpr inline vec3(float _v, const vec2& _vec) noexcept      : v{ _v, _vec.x, _vec.y } {}
 
 #if defined(__CUDACC__)
-        CUDA_CALL constexpr inline vec3(float3 _v) noexcept                       : v{ _v.x, _v.y, _v.z } {}
+        CUDA_ANY constexpr inline vec3(float3 _v) noexcept                       : v{ _v.x, _v.y, _v.z } {}
 
-        CUDA_CALL inline operator float3() const { return make_float3(x, y, z); }
+        CUDA_ANY inline operator float3() const { return make_float3(x, y, z); }
 #endif
     };
 
@@ -212,29 +222,29 @@ namespace math
             struct { float r, g, b, a; }; struct { float rg[2], b0, a0; }; struct { float r0, g0, ba[2]; }; struct { float rgb[3], a1; }; struct { float r1, gba[3]; }; struct { float rgba[4]; };
         };
 
-        CUDA_CALL constexpr inline float& operator[](size_t i)             { return v[i]; }
+        CUDA_ANY constexpr inline float& operator[](size_t i)             { return v[i]; }
 
-        CUDA_CALL constexpr inline const float& operator[](size_t i) const { return v[i]; }
+        CUDA_ANY constexpr inline const float& operator[](size_t i) const { return v[i]; }
 
 
-        CUDA_CALL constexpr inline vec4() noexcept                                           : v{} {}
+        CUDA_ANY constexpr inline vec4() noexcept                                           : v{} {}
 
-        CUDA_CALL constexpr inline vec4(float _v) noexcept                                   : v{_v, _v, _v, _v} {}
+        CUDA_ANY constexpr inline vec4(float _v) noexcept                                   : v{_v, _v, _v, _v} {}
 
-        CUDA_CALL constexpr inline vec4(float _v1, float _v2, float _v3, float _v4) noexcept : v{ _v1, _v2, _v3, _v4 } {}
+        CUDA_ANY constexpr inline vec4(float _v1, float _v2, float _v3, float _v4) noexcept : v{ _v1, _v2, _v3, _v4 } {}
 
-        CUDA_CALL constexpr inline vec4(const float _v[4]) noexcept                          : v{ _v[0], _v[1], _v[2], _v[3] } {}
+        CUDA_ANY constexpr inline vec4(const float _v[4]) noexcept                          : v{ _v[0], _v[1], _v[2], _v[3] } {}
 
-        CUDA_CALL constexpr inline vec4(const vec2& _vec1, const vec2& _vec2) noexcept       : v{ _vec1.x, _vec1.y, _vec2.x, _vec2.y } {}
+        CUDA_ANY constexpr inline vec4(const vec2& _vec1, const vec2& _vec2) noexcept       : v{ _vec1.x, _vec1.y, _vec2.x, _vec2.y } {}
 
-		CUDA_CALL constexpr inline vec4(const vec3& _vec, float _v) noexcept                 : v{_vec.x, _vec.y, _vec.z, _v} {}
+		CUDA_ANY constexpr inline vec4(const vec3& _vec, float _v) noexcept                 : v{_vec.x, _vec.y, _vec.z, _v} {}
 
-        CUDA_CALL constexpr inline vec4(float _v, const vec3& _vec) noexcept                 : v{ _v, _vec.x, _vec.y, _vec.z } {}
+        CUDA_ANY constexpr inline vec4(float _v, const vec3& _vec) noexcept                 : v{ _v, _vec.x, _vec.y, _vec.z } {}
 
 #if defined(__CUDACC__)
-        CUDA_CALL constexpr inline vec4(float4 _v) noexcept                                  : v{ _v.x, _v.y, _v.z, _v.w } {}
+        CUDA_ANY constexpr inline vec4(float4 _v) noexcept                                  : v{ _v.x, _v.y, _v.z, _v.w } {}
 
-        CUDA_CALL inline operator float4() const { return make_float4(x, y, z, w); }
+        CUDA_ANY inline operator float4() const { return make_float4(x, y, z, w); }
 #endif
     };
 
@@ -251,16 +261,16 @@ namespace math
         };
 
 
-        CUDA_CALL constexpr vec4& operator[](size_t i)             { return m[i]; }
+        CUDA_ANY constexpr vec4& operator[](size_t i)             { return m[i]; }
 
-        CUDA_CALL constexpr const vec4& operator[](size_t i) const { return m[i]; }
+        CUDA_ANY constexpr const vec4& operator[](size_t i) const { return m[i]; }
 
 
-        CUDA_CALL constexpr inline mat4() noexcept                                                                        : m{} {}
+        CUDA_ANY constexpr inline mat4() noexcept                                                                        : m{} {}
 
-        CUDA_CALL constexpr inline explicit mat4(float _i) noexcept                                                       : m{} { _m00 = _m11 = _m22 = _m33 = _i; }
+        CUDA_ANY constexpr inline explicit mat4(float _i) noexcept                                                       : m{} { _m00 = _m11 = _m22 = _m33 = _i; }
 
-        CUDA_CALL constexpr inline explicit mat4(const vec4& v0, const vec4& v1, const vec4& v2, const vec4& v3) noexcept : m{ v0, v1, v2, v3 } {}
+        CUDA_ANY constexpr inline explicit mat4(const vec4& v0, const vec4& v1, const vec4& v2, const vec4& v3) noexcept : m{ v0, v1, v2, v3 } {}
     };
 
     struct mat3
@@ -275,112 +285,112 @@ namespace math
         };
 
 
-        CUDA_CALL constexpr vec3& operator[](size_t i)             { return m[i]; }
+        CUDA_ANY constexpr vec3& operator[](size_t i)             { return m[i]; }
 
-        CUDA_CALL constexpr const vec3& operator[](size_t i) const { return m[i]; }
+        CUDA_ANY constexpr const vec3& operator[](size_t i) const { return m[i]; }
 
 
-        CUDA_CALL constexpr inline mat3() noexcept : m{} {}
+        CUDA_ANY constexpr inline mat3() noexcept : m{} {}
 
-        CUDA_CALL constexpr inline explicit mat3(float _i) noexcept                                       : m{} { _m00 = _m11 = _m22 = _i; }
+        CUDA_ANY constexpr inline explicit mat3(float _i) noexcept                                       : m{} { _m00 = _m11 = _m22 = _i; }
 
-        CUDA_CALL constexpr inline explicit mat3(const vec3& v0, const vec3& v1, const vec3& v2) noexcept : m{ v0, v1, v2 } {}
+        CUDA_ANY constexpr inline explicit mat3(const vec3& v0, const vec3& v1, const vec3& v2) noexcept : m{ v0, v1, v2 } {}
 
-        CUDA_CALL constexpr inline explicit mat3(const mat4& _m) noexcept                                 : m{ _m[0].xyz, _m[1].xyz, _m[2].xyz } {}
+        CUDA_ANY constexpr inline explicit mat3(const mat4& _m) noexcept                                 : m{ _m[0].xyz, _m[1].xyz, _m[2].xyz } {}
     };
 
     //
     // compatibility with GLM
     //
-    CUDA_CALL constexpr inline const float* value_ptr(const vec2& v)                   { return &(v.v[0]); }
-    CUDA_CALL constexpr inline const float* value_ptr(const vec3& v)                   { return &(v.v[0]); }
-    CUDA_CALL constexpr inline const float* value_ptr(const vec4& v)                   { return &(v.v[0]); }
-    CUDA_CALL constexpr inline const float* value_ptr(const mat3& m)                   { return value_ptr(m.m[0]); }
-    CUDA_CALL constexpr inline const float* value_ptr(const mat4& m)                   { return value_ptr(m.m[0]); }
+    CUDA_ANY constexpr inline const float* value_ptr(const vec2& v)                   { return &(v.v[0]); }
+    CUDA_ANY constexpr inline const float* value_ptr(const vec3& v)                   { return &(v.v[0]); }
+    CUDA_ANY constexpr inline const float* value_ptr(const vec4& v)                   { return &(v.v[0]); }
+    CUDA_ANY constexpr inline const float* value_ptr(const mat3& m)                   { return value_ptr(m.m[0]); }
+    CUDA_ANY constexpr inline const float* value_ptr(const mat4& m)                   { return value_ptr(m.m[0]); }
 
     //
     // operators
     //
-    CUDA_CALL constexpr inline vec2 operator+(const vec2& a, float b)                  { return vec2{ a.x + b, a.y + b }; }
-    CUDA_CALL constexpr inline vec2 operator+(float b, const vec2& a)                  { return vec2{ a.x + b, a.y + b }; }
-    CUDA_CALL constexpr inline vec2 operator+(const vec2& a, const vec2& b)            { return vec2{ a.x + b.x, a.y + b.y }; }
-    CUDA_CALL constexpr inline vec2 operator-(const vec2& a)                           { return vec2{ -a.x, -a.y }; }
-    CUDA_CALL constexpr inline vec2 operator-(const vec2& a, float b)                  { return vec2{ a.x - b, a.y - b }; }
-    CUDA_CALL constexpr inline vec2 operator-(float b, const vec2& a)                  { return vec2{ a.x - b, a.y - b }; }
-    CUDA_CALL constexpr inline vec2 operator-(const vec2& a, const vec2& b)            { return vec2{ a.x - b.x, a.y - b.y }; }
-    CUDA_CALL constexpr inline vec2 operator*(const vec2& a, float b)                  { return vec2{ a.x * b, a.y * b }; }
-    CUDA_CALL constexpr inline vec2 operator*(float b, const vec2& a)                  { return vec2{ a.x * b, a.y * b }; }
-    CUDA_CALL constexpr inline vec2 operator*(const vec2& a, const vec2& b)            { return vec2{ a.x * b.x, a.y * b.y }; }
-    CUDA_CALL constexpr inline vec2 operator/(const vec2& a, float b)                  { return vec2{ a.x / b, a.y / b }; }
-    CUDA_CALL constexpr inline vec2 operator/(float a, const vec2& b)                  { return vec2{ a / b.x, a / b.y }; }
-    CUDA_CALL constexpr inline vec2 operator/(const vec2& a, const vec2& b)            { return vec2{ a.x / b.x, a.y / b.y }; }
-    CUDA_CALL constexpr inline vec2& operator+=(vec2& a, float b)                      { a.x += b; a.y += b; return a; }
-    CUDA_CALL constexpr inline vec2& operator-=(vec2& a, float b)                      { a.x -= b; a.y -= b; return a; }
-    CUDA_CALL constexpr inline vec2& operator*=(vec2& a, float b)                      { a.x *= b; a.y *= b; return a; }
-    CUDA_CALL constexpr inline vec2& operator/=(vec2& a, float b)                      { a.x /= b; a.y /= b; return a; }
-    CUDA_CALL constexpr inline bool operator==(const vec2& a, const vec2& b)           { return are_equal(a.x, b.x) && are_equal(a.y, b.y); }
-    CUDA_CALL constexpr inline bool operator!=(const vec2& a, const vec2& b)           { return !(a == b); }
-    CUDA_CALL constexpr inline vec2 pmax(const vec2& a, const vec2& b)                 { return vec2{ max(a.x, b.x), max(a.y, b.y) }; }
-    CUDA_CALL constexpr inline vec2 pmin(const vec2& a, const vec2& b)                 { return vec2{ min(a.x, b.x), min(a.y, b.y) }; }
+    CUDA_ANY constexpr inline vec2 operator+(const vec2& a, float b)                  { return vec2{ a.x + b, a.y + b }; }
+    CUDA_ANY constexpr inline vec2 operator+(float b, const vec2& a)                  { return vec2{ a.x + b, a.y + b }; }
+    CUDA_ANY constexpr inline vec2 operator+(const vec2& a, const vec2& b)            { return vec2{ a.x + b.x, a.y + b.y }; }
+    CUDA_ANY constexpr inline vec2 operator-(const vec2& a)                           { return vec2{ -a.x, -a.y }; }
+    CUDA_ANY constexpr inline vec2 operator-(const vec2& a, float b)                  { return vec2{ a.x - b, a.y - b }; }
+    CUDA_ANY constexpr inline vec2 operator-(float b, const vec2& a)                  { return vec2{ a.x - b, a.y - b }; }
+    CUDA_ANY constexpr inline vec2 operator-(const vec2& a, const vec2& b)            { return vec2{ a.x - b.x, a.y - b.y }; }
+    CUDA_ANY constexpr inline vec2 operator*(const vec2& a, float b)                  { return vec2{ a.x * b, a.y * b }; }
+    CUDA_ANY constexpr inline vec2 operator*(float b, const vec2& a)                  { return vec2{ a.x * b, a.y * b }; }
+    CUDA_ANY constexpr inline vec2 operator*(const vec2& a, const vec2& b)            { return vec2{ a.x * b.x, a.y * b.y }; }
+    CUDA_ANY constexpr inline vec2 operator/(const vec2& a, float b)                  { return vec2{ a.x / b, a.y / b }; }
+    CUDA_ANY constexpr inline vec2 operator/(float a, const vec2& b)                  { return vec2{ a / b.x, a / b.y }; }
+    CUDA_ANY constexpr inline vec2 operator/(const vec2& a, const vec2& b)            { return vec2{ a.x / b.x, a.y / b.y }; }
+    CUDA_ANY constexpr inline vec2& operator+=(vec2& a, float b)                      { a.x += b; a.y += b; return a; }
+    CUDA_ANY constexpr inline vec2& operator-=(vec2& a, float b)                      { a.x -= b; a.y -= b; return a; }
+    CUDA_ANY constexpr inline vec2& operator*=(vec2& a, float b)                      { a.x *= b; a.y *= b; return a; }
+    CUDA_ANY constexpr inline vec2& operator/=(vec2& a, float b)                      { a.x /= b; a.y /= b; return a; }
+    CUDA_ANY constexpr inline bool operator==(const vec2& a, const vec2& b)           { return are_equal(a.x, b.x) && are_equal(a.y, b.y); }
+    CUDA_ANY constexpr inline bool operator!=(const vec2& a, const vec2& b)           { return !(a == b); }
+    CUDA_ANY constexpr inline vec2 pmax(const vec2& a, const vec2& b)                 { return vec2{ max(a.x, b.x), max(a.y, b.y) }; }
+    CUDA_ANY constexpr inline vec2 pmin(const vec2& a, const vec2& b)                 { return vec2{ min(a.x, b.x), min(a.y, b.y) }; }
 
-    CUDA_CALL constexpr inline vec3 operator+(const vec3& a, float b)                  { return vec3{ a.x + b, a.y + b, a.z + b }; }
-    CUDA_CALL constexpr inline vec3 operator+(float b, const vec3& a)                  { return vec3{ a.x + b, a.y + b, a.z + b }; }
-    CUDA_CALL constexpr inline vec3 operator+(const vec3& a, const vec3& b)            { return vec3{ a.x + b.x, a.y + b.y, a.z + b.z }; }
-    CUDA_CALL constexpr inline vec3 operator-(const vec3& a)                           { return vec3{ -a.x, -a.y, -a.z }; }
-    CUDA_CALL constexpr inline vec3 operator-(const vec3& a, float b)                  { return vec3{ a.x - b, a.y - b, a.z - b }; }
-    CUDA_CALL constexpr inline vec3 operator-(float b, const vec3& a)                  { return vec3{ a.x - b, a.y - b, a.z - b }; }
-    CUDA_CALL constexpr inline vec3 operator-(const vec3& a, const vec3& b)            { return vec3{ a.x - b.x, a.y - b.y, a.z - b.z }; }
-    CUDA_CALL constexpr inline vec3 operator*(const vec3& a, float b)                  { return vec3{ a.x * b, a.y * b, a.z * b }; }
-    CUDA_CALL constexpr inline vec3 operator*(float b, const vec3& a)                  { return vec3{ a.x * b, a.y * b, a.z * b }; }
-    CUDA_CALL constexpr inline vec3 operator*(const vec3& a, const vec3& b)            { return vec3{ a.x * b.x, a.y * b.y, a.z * b.z }; }
-    CUDA_CALL constexpr inline vec3 operator/(const vec3& a, float b)                  { return vec3{ a.x / b, a.y / b, a.z / b }; }
-    CUDA_CALL constexpr inline vec3 operator/(float a, const vec3& b)                  { return vec3{ a / b.x, a / b.y, a / b.z }; }
-    CUDA_CALL constexpr inline vec3 operator/(const vec3& a, const vec3& b)            { return vec3{ a.x / b.x, a.y / b.y, a.z / b.z }; }
-    CUDA_CALL constexpr inline vec3& operator+=(vec3& a, const vec3& b)                { a.x += b.x; a.y += b.y; a.z += b.z; return a; }
-    CUDA_CALL constexpr inline vec3& operator-=(vec3& a, const vec3& b)                { a.x -= b.x; a.y -= b.y; a.z -= b.z; return a; }
-    CUDA_CALL constexpr inline vec3& operator*=(vec3& a, const vec3& b)                { a.x *= b.x; a.y *= b.y; a.z *= b.z; return a; }
-    CUDA_CALL constexpr inline vec3& operator/=(vec3& a, const vec3& b)                { a.x /= b.x; a.y /= b.y; a.z /= b.z; return a; }
-    CUDA_CALL constexpr inline vec3& operator+=(vec3& a, float b)                      { a.x += b; a.y += b; a.z += b; return a; }
-    CUDA_CALL constexpr inline vec3& operator-=(vec3& a, float b)                      { a.x -= b; a.y -= b; a.z -= b; return a; }
-    CUDA_CALL constexpr inline vec3& operator*=(vec3& a, float b)                      { a.x *= b; a.y *= b; a.z *= b; return a; }
-    CUDA_CALL constexpr inline vec3& operator/=(vec3& a, float b)                      { a.x /= b; a.y /= b; a.z /= b; return a; }
-    CUDA_CALL constexpr inline bool operator==(const vec3& a, const vec3& b)           { return are_equal(a.x, b.x) && are_equal(a.y, b.y) && are_equal(a.z, b.z); }
-    CUDA_CALL constexpr inline bool operator!=(const vec3& a, const vec3& b)           { return !(a == b); }
-    CUDA_CALL constexpr inline vec3 pmax(const vec3& a, const vec3& b)                 { return vec3{ max(a.x, b.x), max(a.y, b.y), max(a.z, b.z) }; }
-    CUDA_CALL constexpr inline vec3 pmin(const vec3& a, const vec3& b)                 { return vec3{ min(a.x, b.x), min(a.y, b.y), min(a.z, b.z) }; }
+    CUDA_ANY constexpr inline vec3 operator+(const vec3& a, float b)                  { return vec3{ a.x + b, a.y + b, a.z + b }; }
+    CUDA_ANY constexpr inline vec3 operator+(float b, const vec3& a)                  { return vec3{ a.x + b, a.y + b, a.z + b }; }
+    CUDA_ANY constexpr inline vec3 operator+(const vec3& a, const vec3& b)            { return vec3{ a.x + b.x, a.y + b.y, a.z + b.z }; }
+    CUDA_ANY constexpr inline vec3 operator-(const vec3& a)                           { return vec3{ -a.x, -a.y, -a.z }; }
+    CUDA_ANY constexpr inline vec3 operator-(const vec3& a, float b)                  { return vec3{ a.x - b, a.y - b, a.z - b }; }
+    CUDA_ANY constexpr inline vec3 operator-(float b, const vec3& a)                  { return vec3{ a.x - b, a.y - b, a.z - b }; }
+    CUDA_ANY constexpr inline vec3 operator-(const vec3& a, const vec3& b)            { return vec3{ a.x - b.x, a.y - b.y, a.z - b.z }; }
+    CUDA_ANY constexpr inline vec3 operator*(const vec3& a, float b)                  { return vec3{ a.x * b, a.y * b, a.z * b }; }
+    CUDA_ANY constexpr inline vec3 operator*(float b, const vec3& a)                  { return vec3{ a.x * b, a.y * b, a.z * b }; }
+    CUDA_ANY constexpr inline vec3 operator*(const vec3& a, const vec3& b)            { return vec3{ a.x * b.x, a.y * b.y, a.z * b.z }; }
+    CUDA_ANY constexpr inline vec3 operator/(const vec3& a, float b)                  { return vec3{ a.x / b, a.y / b, a.z / b }; }
+    CUDA_ANY constexpr inline vec3 operator/(float a, const vec3& b)                  { return vec3{ a / b.x, a / b.y, a / b.z }; }
+    CUDA_ANY constexpr inline vec3 operator/(const vec3& a, const vec3& b)            { return vec3{ a.x / b.x, a.y / b.y, a.z / b.z }; }
+    CUDA_ANY constexpr inline vec3& operator+=(vec3& a, const vec3& b)                { a.x += b.x; a.y += b.y; a.z += b.z; return a; }
+    CUDA_ANY constexpr inline vec3& operator-=(vec3& a, const vec3& b)                { a.x -= b.x; a.y -= b.y; a.z -= b.z; return a; }
+    CUDA_ANY constexpr inline vec3& operator*=(vec3& a, const vec3& b)                { a.x *= b.x; a.y *= b.y; a.z *= b.z; return a; }
+    CUDA_ANY constexpr inline vec3& operator/=(vec3& a, const vec3& b)                { a.x /= b.x; a.y /= b.y; a.z /= b.z; return a; }
+    CUDA_ANY constexpr inline vec3& operator+=(vec3& a, float b)                      { a.x += b; a.y += b; a.z += b; return a; }
+    CUDA_ANY constexpr inline vec3& operator-=(vec3& a, float b)                      { a.x -= b; a.y -= b; a.z -= b; return a; }
+    CUDA_ANY constexpr inline vec3& operator*=(vec3& a, float b)                      { a.x *= b; a.y *= b; a.z *= b; return a; }
+    CUDA_ANY constexpr inline vec3& operator/=(vec3& a, float b)                      { a.x /= b; a.y /= b; a.z /= b; return a; }
+    CUDA_ANY constexpr inline bool operator==(const vec3& a, const vec3& b)           { return are_equal(a.x, b.x) && are_equal(a.y, b.y) && are_equal(a.z, b.z); }
+    CUDA_ANY constexpr inline bool operator!=(const vec3& a, const vec3& b)           { return !(a == b); }
+    CUDA_ANY constexpr inline vec3 pmax(const vec3& a, const vec3& b)                 { return vec3{ max(a.x, b.x), max(a.y, b.y), max(a.z, b.z) }; }
+    CUDA_ANY constexpr inline vec3 pmin(const vec3& a, const vec3& b)                 { return vec3{ min(a.x, b.x), min(a.y, b.y), min(a.z, b.z) }; }
 
-    CUDA_CALL constexpr inline vec4 operator+(const vec4& a, float b)                  { return vec4{ a.x + b, a.y + b, a.z + b, a.w + b }; }
-    CUDA_CALL constexpr inline vec4 operator+(float b, const vec4& a)                  { return vec4{ a.x + b, a.y + b, a.z + b, a.w + b }; }
-    CUDA_CALL constexpr inline vec4 operator+(const vec4& a, const vec4& b)            { return vec4{ a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w }; }
-    CUDA_CALL constexpr inline vec4 operator-(const vec4& a)                           { return vec4{ -a.x, -a.y, -a.z, -a.w }; }
-    CUDA_CALL constexpr inline vec4 operator-(const vec4& a, float b)                  { return vec4{ a.x - b, a.y - b, a.z - b, a.w - b }; }
-    CUDA_CALL constexpr inline vec4 operator-(float b, const vec4& a)                  { return vec4{ a.x - b, a.y - b, a.z - b, a.w - b }; }
-    CUDA_CALL constexpr inline vec4 operator-(const vec4& a, const vec4& b)            { return vec4{ a.x - b.x, a.y - b.y, a.z - b.z, a.w - b.w }; }
-    CUDA_CALL constexpr inline vec4 operator*(const vec4& a, float b)                  { return vec4{ a.x * b, a.y * b, a.z * b, a.w * b }; }
-    CUDA_CALL constexpr inline vec4 operator*(float b, const vec4& a)                  { return vec4{ a.x * b, a.y * b, a.z * b, a.w * b }; }
-    CUDA_CALL constexpr inline vec4 operator*(const vec4& a, const vec4& b)            { return vec4{ a.x * b.x, a.y * b.y, a.z * b.z, a.w * b.w }; }
-    CUDA_CALL constexpr inline vec4 operator/(const vec4& a, float b)                  { return vec4{ a.x / b, a.y / b, a.z / b, a.w / b }; }
-    CUDA_CALL constexpr inline vec4 operator/(float a, const vec4& b)                  { return vec4{ a / b.x, a / b.y, a / b.z, a / b.w }; }
-    CUDA_CALL constexpr inline vec4 operator/(const vec4& a, const vec4& b)            { return vec4{ a.x / b.x, a.y / b.y, a.z / b.z, a.w / b.w }; }
-    CUDA_CALL constexpr inline vec4& operator+=(vec4& a, const vec4& b)                { a.x += b.x; a.y += b.y; a.z += b.z; a.w += b.w; return a; }
-    CUDA_CALL constexpr inline vec4& operator-=(vec4& a, const vec4& b)                { a.x -= b.x; a.y -= b.y; a.z -= b.z; a.w -= b.w; return a; }
-    CUDA_CALL constexpr inline vec4& operator*=(vec4& a, const vec4& b)                { a.x *= b.x; a.y *= b.y; a.z *= b.z; a.w *= b.w; return a; }
-    CUDA_CALL constexpr inline vec4& operator/=(vec4& a, const vec4& b)                { a.x /= b.x; a.y /= b.y; a.z /= b.z; a.w /= b.w; return a; }
-    CUDA_CALL constexpr inline vec4& operator+=(vec4& a, float b)                      { a.x += b; a.y += b; a.z += b; a.w += b; return a; }
-    CUDA_CALL constexpr inline vec4& operator-=(vec4& a, float b)                      { a.x -= b; a.y -= b; a.z -= b; a.w -= b; return a; }
-    CUDA_CALL constexpr inline vec4& operator*=(vec4& a, float b)                      { a.x *= b; a.y *= b; a.z *= b; a.w *= b; return a; }
-    CUDA_CALL constexpr inline vec4& operator/=(vec4& a, float b)                      { a.x /= b; a.y /= b; a.z /= b; a.w /= b; return a; }
-    CUDA_CALL constexpr inline bool operator==(const vec4& a, const vec4& b)           { return are_equal(a.x, b.x) && are_equal(a.y, b.y) && are_equal(a.z, b.z) && are_equal(a.w, b.w); }
-    CUDA_CALL constexpr inline bool operator!=(const vec4& a, const vec4& b)           { return !(a == b); }
-    CUDA_CALL constexpr inline vec4 pmax(const vec4& a, const vec4& b)                 { return vec4{ max(a.x, b.x), max(a.y, b.y), max(a.z, b.z), max(a.w, b.w) }; }
-    CUDA_CALL constexpr inline vec4 pmin(const vec4& a, const vec4& b)                 { return vec4{ min(a.x, b.x), min(a.y, b.y), min(a.z, b.z), min(a.w, b.w) }; }
+    CUDA_ANY constexpr inline vec4 operator+(const vec4& a, float b)                  { return vec4{ a.x + b, a.y + b, a.z + b, a.w + b }; }
+    CUDA_ANY constexpr inline vec4 operator+(float b, const vec4& a)                  { return vec4{ a.x + b, a.y + b, a.z + b, a.w + b }; }
+    CUDA_ANY constexpr inline vec4 operator+(const vec4& a, const vec4& b)            { return vec4{ a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w }; }
+    CUDA_ANY constexpr inline vec4 operator-(const vec4& a)                           { return vec4{ -a.x, -a.y, -a.z, -a.w }; }
+    CUDA_ANY constexpr inline vec4 operator-(const vec4& a, float b)                  { return vec4{ a.x - b, a.y - b, a.z - b, a.w - b }; }
+    CUDA_ANY constexpr inline vec4 operator-(float b, const vec4& a)                  { return vec4{ a.x - b, a.y - b, a.z - b, a.w - b }; }
+    CUDA_ANY constexpr inline vec4 operator-(const vec4& a, const vec4& b)            { return vec4{ a.x - b.x, a.y - b.y, a.z - b.z, a.w - b.w }; }
+    CUDA_ANY constexpr inline vec4 operator*(const vec4& a, float b)                  { return vec4{ a.x * b, a.y * b, a.z * b, a.w * b }; }
+    CUDA_ANY constexpr inline vec4 operator*(float b, const vec4& a)                  { return vec4{ a.x * b, a.y * b, a.z * b, a.w * b }; }
+    CUDA_ANY constexpr inline vec4 operator*(const vec4& a, const vec4& b)            { return vec4{ a.x * b.x, a.y * b.y, a.z * b.z, a.w * b.w }; }
+    CUDA_ANY constexpr inline vec4 operator/(const vec4& a, float b)                  { return vec4{ a.x / b, a.y / b, a.z / b, a.w / b }; }
+    CUDA_ANY constexpr inline vec4 operator/(float a, const vec4& b)                  { return vec4{ a / b.x, a / b.y, a / b.z, a / b.w }; }
+    CUDA_ANY constexpr inline vec4 operator/(const vec4& a, const vec4& b)            { return vec4{ a.x / b.x, a.y / b.y, a.z / b.z, a.w / b.w }; }
+    CUDA_ANY constexpr inline vec4& operator+=(vec4& a, const vec4& b)                { a.x += b.x; a.y += b.y; a.z += b.z; a.w += b.w; return a; }
+    CUDA_ANY constexpr inline vec4& operator-=(vec4& a, const vec4& b)                { a.x -= b.x; a.y -= b.y; a.z -= b.z; a.w -= b.w; return a; }
+    CUDA_ANY constexpr inline vec4& operator*=(vec4& a, const vec4& b)                { a.x *= b.x; a.y *= b.y; a.z *= b.z; a.w *= b.w; return a; }
+    CUDA_ANY constexpr inline vec4& operator/=(vec4& a, const vec4& b)                { a.x /= b.x; a.y /= b.y; a.z /= b.z; a.w /= b.w; return a; }
+    CUDA_ANY constexpr inline vec4& operator+=(vec4& a, float b)                      { a.x += b; a.y += b; a.z += b; a.w += b; return a; }
+    CUDA_ANY constexpr inline vec4& operator-=(vec4& a, float b)                      { a.x -= b; a.y -= b; a.z -= b; a.w -= b; return a; }
+    CUDA_ANY constexpr inline vec4& operator*=(vec4& a, float b)                      { a.x *= b; a.y *= b; a.z *= b; a.w *= b; return a; }
+    CUDA_ANY constexpr inline vec4& operator/=(vec4& a, float b)                      { a.x /= b; a.y /= b; a.z /= b; a.w /= b; return a; }
+    CUDA_ANY constexpr inline bool operator==(const vec4& a, const vec4& b)           { return are_equal(a.x, b.x) && are_equal(a.y, b.y) && are_equal(a.z, b.z) && are_equal(a.w, b.w); }
+    CUDA_ANY constexpr inline bool operator!=(const vec4& a, const vec4& b)           { return !(a == b); }
+    CUDA_ANY constexpr inline vec4 pmax(const vec4& a, const vec4& b)                 { return vec4{ max(a.x, b.x), max(a.y, b.y), max(a.z, b.z), max(a.w, b.w) }; }
+    CUDA_ANY constexpr inline vec4 pmin(const vec4& a, const vec4& b)                 { return vec4{ min(a.x, b.x), min(a.y, b.y), min(a.z, b.z), min(a.w, b.w) }; }
 
-    CUDA_CALL constexpr inline bool operator==(const mat3& a, const mat3& b)           { return a[0] == b[0] && a[1] == b[1] && a[2] == b[2]; }
-    CUDA_CALL constexpr inline bool operator!=(const mat3& a, const mat3& b)           { return !(a == b); }
-    CUDA_CALL constexpr inline bool operator==(const mat4& a, const mat4& b)           { return a[0] == b[0] && a[1] == b[1] && a[2] == b[2] && a[3] == b[3]; }
-    CUDA_CALL constexpr inline bool operator!=(const mat4& a, const mat4& b)           { return !(a == b); }
+    CUDA_ANY constexpr inline bool operator==(const mat3& a, const mat3& b)           { return a[0] == b[0] && a[1] == b[1] && a[2] == b[2]; }
+    CUDA_ANY constexpr inline bool operator!=(const mat3& a, const mat3& b)           { return !(a == b); }
+    CUDA_ANY constexpr inline bool operator==(const mat4& a, const mat4& b)           { return a[0] == b[0] && a[1] == b[1] && a[2] == b[2] && a[3] == b[3]; }
+    CUDA_ANY constexpr inline bool operator!=(const mat4& a, const mat4& b)           { return !(a == b); }
 
-    CUDA_CALL constexpr inline mat3 operator*(const mat3& a, const mat3& b)
+    CUDA_ANY constexpr inline mat3 operator*(const mat3& a, const mat3& b)
     {
         return mat3
         {
@@ -390,7 +400,7 @@ namespace math
         };
     }
 
-    CUDA_CALL constexpr inline vec3 operator*(const mat3& a, const vec3& b)
+    CUDA_ANY constexpr inline vec3 operator*(const mat3& a, const vec3& b)
     {
         return vec3
         {
@@ -400,7 +410,7 @@ namespace math
         };
     }
 
-    CUDA_CALL constexpr inline vec3 operator*(const vec3& a, const mat3& b)
+    CUDA_ANY constexpr inline vec3 operator*(const vec3& a, const mat3& b)
     {
         return vec3
         {
@@ -410,7 +420,7 @@ namespace math
         };
     }
 
-    CUDA_CALL constexpr inline mat4 operator*(const mat4& a, const mat4& b)
+    CUDA_ANY constexpr inline mat4 operator*(const mat4& a, const mat4& b)
     {
         return mat4
         {
@@ -421,7 +431,7 @@ namespace math
         };
     }
 
-    CUDA_CALL constexpr inline vec4 operator*(const mat4& a, const vec4& b)
+    CUDA_ANY constexpr inline vec4 operator*(const mat4& a, const vec4& b)
     {
         return vec4
         {
@@ -432,7 +442,7 @@ namespace math
         };
     }
 
-    CUDA_CALL constexpr inline vec4 operator*(const vec4& a, const mat4& b)
+    CUDA_ANY constexpr inline vec4 operator*(const vec4& a, const mat4& b)
 	{
 		return vec4
 		{
@@ -447,37 +457,37 @@ namespace math
     // useful specializations
     //
     template<>
-    CUDA_CALL constexpr inline vec2 clamp(const vec2& a, const vec2& lower, const vec2& upper)
+    CUDA_ANY constexpr inline vec2 clamp(const vec2& a, const vec2& lower, const vec2& upper)
     {
         return { clamp(a.x, lower.x, upper.x), clamp(a.y, lower.y, upper.y) };
     }
 
     template<>
-    CUDA_CALL constexpr inline vec2 saturate(const vec2& a)
+    CUDA_ANY constexpr inline vec2 saturate(const vec2& a)
     {
         return { saturate(a.x), saturate(a.y) };
     }
 
     template<>
-    CUDA_CALL constexpr inline vec3 clamp(const vec3& a, const vec3& lower, const vec3& upper)
+    CUDA_ANY constexpr inline vec3 clamp(const vec3& a, const vec3& lower, const vec3& upper)
     {
         return { clamp(a.x, lower.x, upper.x), clamp(a.y, lower.y, upper.y), clamp(a.z, lower.z, upper.z) };
     }
 
     template<>
-    CUDA_CALL constexpr inline vec3 saturate(const vec3& a)
+    CUDA_ANY constexpr inline vec3 saturate(const vec3& a)
     {
         return { saturate(a.x), saturate(a.y), saturate(a.z) };
     }
 
     template<>
-    CUDA_CALL constexpr inline vec4 clamp(const vec4& a, const vec4& lower, const vec4& upper)
+    CUDA_ANY constexpr inline vec4 clamp(const vec4& a, const vec4& lower, const vec4& upper)
     {
         return { clamp(a.x, lower.x, upper.x), clamp(a.y, lower.y, upper.y), clamp(a.z, lower.z, upper.z), clamp(a.w, lower.w, upper.w) };
     }
 
     template<>
-    CUDA_CALL constexpr inline vec4 saturate(const vec4& a)
+    CUDA_ANY constexpr inline vec4 saturate(const vec4& a)
     {
         return { saturate(a.x), saturate(a.y), saturate(a.z), saturate(a.w) };
     }
@@ -486,47 +496,47 @@ namespace math
     //
     // trig functions
     //
-    CUDA_CALL constexpr inline float dot(const vec3& a, const vec3& b)
+    CUDA_ANY constexpr inline float dot(const vec3& a, const vec3& b)
     {
         return a.x * b.x + a.y * b.y + a.z * b.z;
     }
 
-    CUDA_CALL constexpr inline float length2(const vec3& a)
+    CUDA_ANY constexpr inline float length2(const vec3& a)
     {
         return dot(a, a);
     }
 
-    CUDA_CALL CC_CONSTEXPR inline float length(const vec3& a)
+    CUDA_ANY CC_CONSTEXPR inline float length(const vec3& a)
     {
         return sqrtf(length2(a));
     }
 
-    CUDA_CALL constexpr inline float distance2(const vec3& a, const vec3& b)
+    CUDA_ANY constexpr inline float distance2(const vec3& a, const vec3& b)
     {
         return (a.x - b.x) * (a.x - b.x) - (a.y - b.y) * (a.y - b.y) - (a.z - b.z) * (a.z - b.z);
     }
 
-    CUDA_CALL CC_CONSTEXPR inline float distance(const vec3& a, const vec3& b)
+    CUDA_ANY CC_CONSTEXPR inline float distance(const vec3& a, const vec3& b)
     {
         return sqrtf(distance2(a, b));
     }
 
-    CUDA_CALL constexpr inline vec3 cross(const vec3& a, const vec3& b)
+    CUDA_ANY constexpr inline vec3 cross(const vec3& a, const vec3& b)
     {
         return vec3{ a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x };
     }
 
-    CUDA_CALL CC_CONSTEXPR inline vec3 normalize(const vec3& a)
+    CUDA_ANY CC_CONSTEXPR inline vec3 normalize(const vec3& a)
     {
         return a / length(a);
     }
 
-    CUDA_CALL constexpr inline vec3 reflect(const vec3& I, const vec3& N)
+    CUDA_ANY constexpr inline vec3 reflect(const vec3& I, const vec3& N)
     {
         return I - N * dot(N, I) * 2.f;
     }
 
-    CUDA_CALL constexpr inline vec3 refract(const vec3& I, const vec3& N, float eta)
+    CUDA_ANY constexpr inline vec3 refract(const vec3& I, const vec3& N, float eta)
     {
         const float NdotI = dot(N, I);
         const float k = 1.f - eta * eta * (1.f - NdotI * NdotI);
@@ -534,14 +544,14 @@ namespace math
         return (k >= .0f)? vec3(eta * I - (eta * NdotI + sqrtf(k)) * N) : vec3();
     }
 
-    CUDA_CALL constexpr inline float determinant(const mat3& m)
+    CUDA_ANY constexpr inline float determinant(const mat3& m)
     {
         return (+ m[0][0] * (m[1][1] * m[2][2] - m[2][1] * m[1][2])
                 - m[1][0] * (m[0][1] * m[2][2] - m[2][1] * m[0][2])
                 + m[2][0] * (m[0][1] * m[1][2] - m[1][1] * m[0][2]));
     }
 
-    CUDA_CALL constexpr inline mat3 inverse(const mat3& m)
+    CUDA_ANY constexpr inline mat3 inverse(const mat3& m)
     {
         const float one_over_det = 1.f / determinant(m);
 
@@ -561,7 +571,7 @@ namespace math
         return inverse;
     }
 
-    CUDA_CALL constexpr inline mat3 transpose(const mat3& m)
+    CUDA_ANY constexpr inline mat3 transpose(const mat3& m)
     {
         mat3 transpose;
         transpose[0][0] = m[0][0];
@@ -579,7 +589,7 @@ namespace math
         return transpose;
     }
 
-    CUDA_CALL constexpr inline mat4 inverse(const mat4& m)
+    CUDA_ANY constexpr inline mat4 inverse(const mat4& m)
 	{
 		float coef00 = m[2][2] * m[3][3] - m[3][2] * m[2][3];
 		float coef02 = m[1][2] * m[3][3] - m[3][2] * m[1][3];
@@ -636,7 +646,7 @@ namespace math
 		return mat4{ inv[0] * one_over_det, inv[1] * one_over_det, inv[2] * one_over_det, inv[3] * one_over_det };
 	}
 
-    CUDA_CALL constexpr inline mat4 transpose(const mat4& m)
+    CUDA_ANY constexpr inline mat4 transpose(const mat4& m)
     {
         mat4 transpose;
         transpose[0][0] = m[0][0];
@@ -662,7 +672,7 @@ namespace math
         return transpose;
     }
 
-    CUDA_CALL constexpr inline mat4 translate(const mat4& m, const vec3& v)
+    CUDA_ANY constexpr inline mat4 translate(const mat4& m, const vec3& v)
     {
         return mat4
         {
@@ -673,7 +683,7 @@ namespace math
         };
     }
 
-    CUDA_CALL CC_CONSTEXPR inline mat4 rotate(const mat4& m, float angle, const vec3& axis)
+    CUDA_ANY CC_CONSTEXPR inline mat4 rotate(const mat4& m, float angle, const vec3& axis)
     {
         const vec3 axis_n = normalize(axis);
         const float x = axis_n.x;
@@ -693,7 +703,7 @@ namespace math
         return m * rot;
     }
 
-    CUDA_CALL constexpr inline mat4 scale(const mat4& m, const vec3& v)
+    CUDA_ANY constexpr inline mat4 scale(const mat4& m, const vec3& v)
     {
         return mat4
         {
@@ -704,7 +714,7 @@ namespace math
         };
     }
 
-    CUDA_CALL CC_CONSTEXPR inline mat4 lookAt(const vec3& eye, const vec3& center, const vec3& up)
+    CUDA_ANY CC_CONSTEXPR inline mat4 lookAt(const vec3& eye, const vec3& center, const vec3& up)
     {
         const vec3 f(normalize(center - eye));
         const vec3 s(normalize(cross(f, up)));
@@ -719,7 +729,7 @@ namespace math
         };
     }
 
-    CUDA_CALL CC_CONSTEXPR inline mat4 perspective(float fovy, float aspect, float znear, float zfar)
+    CUDA_ANY CC_CONSTEXPR inline mat4 perspective(float fovy, float aspect, float znear, float zfar)
     {
         const float f = rcp(tanf(fovy / 2.0f));
 		return mat4
@@ -740,44 +750,44 @@ using math::pow;
 using math::saturate;
 using math::sqrtf;
 
-CUDA_CALL CC_CONSTEXPR inline float srgb(float linear)
+CUDA_ANY CC_CONSTEXPR inline float srgb(float linear)
 {
     return (linear <= 0.0031308f)? 12.92f * linear : 1.055f * pow(linear, 1.f / 2.4f) - 0.055f;
 }
 
-CUDA_CALL CC_CONSTEXPR inline float linear(float srgb)
+CUDA_ANY CC_CONSTEXPR inline float linear(float srgb)
 {
     return (srgb <= 0.04045f) ? srgb / 12.92f : pow((srgb + 0.055f) / 1.055f, 2.4f);
 }
 
-CUDA_CALL CC_CONSTEXPR inline vec3 srgb(const vec3& linear) { return vec3(srgb(linear.r), srgb(linear.g), srgb(linear.b)); }
-CUDA_CALL CC_CONSTEXPR inline vec4 srgb(const vec4& linear) { return vec4(srgb(vec3(linear.rgb)), linear.a); }
-CUDA_CALL CC_CONSTEXPR inline vec3 linear(const vec3& srgb) { return vec3(linear(srgb.r), linear(srgb.g), linear(srgb.b)); }
-CUDA_CALL CC_CONSTEXPR inline vec4 linear(const vec4& srgb) { return vec4(linear(vec3(srgb.rgb)), srgb.a); }
+CUDA_ANY CC_CONSTEXPR inline vec3 srgb(const vec3& linear) { return vec3(srgb(linear.r), srgb(linear.g), srgb(linear.b)); }
+CUDA_ANY CC_CONSTEXPR inline vec4 srgb(const vec4& linear) { return vec4(srgb(vec3(linear.rgb)), linear.a); }
+CUDA_ANY CC_CONSTEXPR inline vec3 linear(const vec3& srgb) { return vec3(linear(srgb.r), linear(srgb.g), linear(srgb.b)); }
+CUDA_ANY CC_CONSTEXPR inline vec4 linear(const vec4& srgb) { return vec4(linear(vec3(srgb.rgb)), srgb.a); }
 
 
 namespace fast
 {
 // assume gamma = 2 approximation
 
-CUDA_CALL CC_CONSTEXPR inline float srgbfast(float linear)
+CUDA_ANY CC_CONSTEXPR inline float srgbfast(float linear)
 {
     return sqrtf(linear);
 }
 
-CUDA_CALL CC_CONSTEXPR inline float linearfast(float srgb)
+CUDA_ANY CC_CONSTEXPR inline float linearfast(float srgb)
 {
     return srgb * srgb;
 }
 
-CUDA_CALL CC_CONSTEXPR inline vec3 srgbfast(const vec3& linear) { return vec3(srgb(linear.r), srgb(linear.g), srgb(linear.b)); }
-CUDA_CALL CC_CONSTEXPR inline vec4 srgbfast(const vec4& linear) { return vec4(srgb(vec3(linear.rgb)), linear.a); }
-CUDA_CALL CC_CONSTEXPR inline vec3 linearfast(const vec3& srgb) { return vec3(linear(srgb.r), linear(srgb.g), linear(srgb.b)); }
-CUDA_CALL CC_CONSTEXPR inline vec4 linearfast(const vec4& srgb) { return vec4(linear(vec3(srgb.rgb)), srgb.a); }
+CUDA_ANY CC_CONSTEXPR inline vec3 srgbfast(const vec3& linear) { return vec3(srgb(linear.r), srgb(linear.g), srgb(linear.b)); }
+CUDA_ANY CC_CONSTEXPR inline vec4 srgbfast(const vec4& linear) { return vec4(srgb(vec3(linear.rgb)), linear.a); }
+CUDA_ANY CC_CONSTEXPR inline vec3 linearfast(const vec3& srgb) { return vec3(linear(srgb.r), linear(srgb.g), linear(srgb.b)); }
+CUDA_ANY CC_CONSTEXPR inline vec4 linearfast(const vec4& srgb) { return vec4(linear(vec3(srgb.rgb)), srgb.a); }
 }
 
 
-CUDA_CALL CC_CONSTEXPR inline float aces(float x)
+CUDA_ANY CC_CONSTEXPR inline float aces(float x)
 {
     // Narkowicz, "ACES Filmic Tone Mapping Curve"
     // https://knarkowicz.wordpress.com/2016/01/06/aces-filmic-tone-mapping-curve/
@@ -789,24 +799,24 @@ CUDA_CALL CC_CONSTEXPR inline float aces(float x)
     return saturate((x * (a * x + b)) / (x * (c * x + d) + e));
 }
 
-CUDA_CALL CC_CONSTEXPR inline vec3 aces(const vec3& linear) { return vec3(aces(linear.x), aces(linear.y), aces(linear.z)); }
-CUDA_CALL CC_CONSTEXPR inline vec4 aces(const vec4& linear) { return vec4(aces(linear.x), aces(linear.y), aces(linear.z), linear.a); }
+CUDA_ANY CC_CONSTEXPR inline vec3 aces(const vec3& linear) { return vec3(aces(linear.x), aces(linear.y), aces(linear.z)); }
+CUDA_ANY CC_CONSTEXPR inline vec4 aces(const vec4& linear) { return vec4(aces(linear.x), aces(linear.y), aces(linear.z), linear.a); }
 
 
-CUDA_CALL CC_CONSTEXPR inline float reinhard(float x)
+CUDA_ANY CC_CONSTEXPR inline float reinhard(float x)
 {
     return saturate(x / (1.0f + x));
 }
 
-CUDA_CALL CC_CONSTEXPR inline vec3 reinhard(const vec3& linear) { return vec3(reinhard(linear.x), reinhard(linear.y), reinhard(linear.z)); }
-CUDA_CALL CC_CONSTEXPR inline vec4 reinhard(const vec4& linear) { return vec4(reinhard(linear.x), reinhard(linear.y), reinhard(linear.z), linear.a); }
+CUDA_ANY CC_CONSTEXPR inline vec3 reinhard(const vec3& linear) { return vec3(reinhard(linear.x), reinhard(linear.y), reinhard(linear.z)); }
+CUDA_ANY CC_CONSTEXPR inline vec4 reinhard(const vec4& linear) { return vec4(reinhard(linear.x), reinhard(linear.y), reinhard(linear.z), linear.a); }
 }
 
 namespace yuv
 {
 using math::vec3;
 
-CUDA_CALL CC_CONSTEXPR inline vec3 yuv(vec3 rgb)
+CUDA_ANY CC_CONSTEXPR inline vec3 yuv(vec3 rgb)
 {
     vec3 yuv;
 
@@ -817,7 +827,7 @@ CUDA_CALL CC_CONSTEXPR inline vec3 yuv(vec3 rgb)
     return yuv;
 }
 
-CUDA_CALL CC_CONSTEXPR inline vec3 rgb(vec3 yuv)
+CUDA_ANY CC_CONSTEXPR inline vec3 rgb(vec3 yuv)
 {
     vec3 rgb;
 
