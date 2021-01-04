@@ -787,7 +787,7 @@ CUDA_ANY CC_CONSTEXPR inline vec4 linearfast(const vec4& srgb) { return vec4(lin
 }
 
 
-CUDA_ANY CC_CONSTEXPR inline float aces(float x)
+CUDA_ANY constexpr inline float aces(float x)
 {
     // Narkowicz, "ACES Filmic Tone Mapping Curve"
     // https://knarkowicz.wordpress.com/2016/01/06/aces-filmic-tone-mapping-curve/
@@ -799,24 +799,24 @@ CUDA_ANY CC_CONSTEXPR inline float aces(float x)
     return saturate((x * (a * x + b)) / (x * (c * x + d) + e));
 }
 
-CUDA_ANY CC_CONSTEXPR inline vec3 aces(const vec3& linear) { return vec3(aces(linear.x), aces(linear.y), aces(linear.z)); }
-CUDA_ANY CC_CONSTEXPR inline vec4 aces(const vec4& linear) { return vec4(aces(linear.x), aces(linear.y), aces(linear.z), linear.a); }
+CUDA_ANY constexpr inline vec3 aces(const vec3& linear) { return vec3(aces(linear.x), aces(linear.y), aces(linear.z)); }
+CUDA_ANY constexpr inline vec4 aces(const vec4& linear) { return vec4(aces(linear.x), aces(linear.y), aces(linear.z), linear.a); }
 
 
-CUDA_ANY CC_CONSTEXPR inline float reinhard(float x)
+CUDA_ANY constexpr inline float reinhard(float x)
 {
     return saturate(x / (1.0f + x));
 }
 
-CUDA_ANY CC_CONSTEXPR inline vec3 reinhard(const vec3& linear) { return vec3(reinhard(linear.x), reinhard(linear.y), reinhard(linear.z)); }
-CUDA_ANY CC_CONSTEXPR inline vec4 reinhard(const vec4& linear) { return vec4(reinhard(linear.x), reinhard(linear.y), reinhard(linear.z), linear.a); }
+CUDA_ANY constexpr inline vec3 reinhard(const vec3& linear) { return vec3(reinhard(linear.x), reinhard(linear.y), reinhard(linear.z)); }
+CUDA_ANY constexpr inline vec4 reinhard(const vec4& linear) { return vec4(reinhard(linear.x), reinhard(linear.y), reinhard(linear.z), linear.a); }
 }
 
 namespace yuv
 {
 using math::vec3;
 
-CUDA_ANY CC_CONSTEXPR inline vec3 yuv(vec3 rgb)
+CUDA_ANY constexpr inline vec3 yuv(vec3 rgb)
 {
     vec3 yuv;
 
@@ -827,7 +827,7 @@ CUDA_ANY CC_CONSTEXPR inline vec3 yuv(vec3 rgb)
     return yuv;
 }
 
-CUDA_ANY CC_CONSTEXPR inline vec3 rgb(vec3 yuv)
+CUDA_ANY constexpr inline vec3 rgb(vec3 yuv)
 {
     vec3 rgb;
 
