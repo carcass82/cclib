@@ -4,8 +4,8 @@ project(CCLib LANGUAGES CXX)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin/")
 
-find_package(benchmark REQUIRED)
-find_package(GTest REQUIRED)
+find_package(benchmark)
+find_package(GTest)
 
 find_package(glm REQUIRED)
 
@@ -44,8 +44,12 @@ message(STATUS "Release CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_RE
 message(STATUS "Debug CMAKE_EXE_LINKER_FLAGS: ${CMAKE_EXE_LINKER_FLAGS} ${CMAKE_EXE_LINKER_FLAGS_DEBUG}")
 message(STATUS "Release CMAKE_EXE_LINKER_FLAGS: ${CMAKE_EXE_LINKER_FLAGS} ${CMAKE_EXE_LINKER_FLAGS_RELEASE}")
 
-add_executable(${PROJECT_NAME}_Benchmark ${BENCHMARK_SRC})
-target_link_libraries(${PROJECT_NAME}_Benchmark benchmark::benchmark)
+if(benchmark_FOUND)
+	add_executable(${PROJECT_NAME}_Benchmark ${BENCHMARK_SRC})
+	target_link_libraries(${PROJECT_NAME}_Benchmark benchmark::benchmark)
+endif()
 
-add_executable(${PROJECT_NAME}_Test ${TEST_SRC})
-target_link_libraries(${PROJECT_NAME}_Test GTest::GTest)
+if(GTest_FOUND)
+	add_executable(${PROJECT_NAME}_Test ${TEST_SRC})
+	target_link_libraries(${PROJECT_NAME}_Test GTest::GTest)
+endif()

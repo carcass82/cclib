@@ -1,4 +1,4 @@
-dist: bionic
+dist: focal
 language: cpp
 
 before_install:
@@ -8,5 +8,5 @@ before_install:
 script:
   - cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release .
   - cmake --build .
-  - ./bin/CCLib_Benchmark
-  - ./bin/CCLib_Test
+  - if [[ -f ./bin/CCLib_Benchmark ]]; then ./bin/CCLib_Benchmark ; fi
+  - if [[ -f ./bin/CCLib_Test ]]; then ./bin/CCLib_Test ; fi
