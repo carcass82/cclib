@@ -100,12 +100,11 @@ BENCHMARK_DEFINE_F(Benchmark, CC_ATAN2)(benchmark::State& st)
 	}
 }
 
-
-BENCHMARK_REGISTER_F(Benchmark, STD_RSQRT)->Name("std::rsqrt()");
-BENCHMARK_REGISTER_F(Benchmark, CC_RSQRT)->Name("cc::rsqrt()");
-BENCHMARK_REGISTER_F(Benchmark, STD_SINCOS)->Name("std::sincos()");
-BENCHMARK_REGISTER_F(Benchmark, CC_SINCOS)->Name("cc::sincos()");
-BENCHMARK_REGISTER_F(Benchmark, STD_ATAN2)->Name("std::atan2()");
-BENCHMARK_REGISTER_F(Benchmark, CC_ATAN2)->Name("cc::atan2()");
+BENCHMARK_REGISTER_F(Benchmark, STD_RSQRT);
+BENCHMARK_REGISTER_F(Benchmark, CC_RSQRT);
+BENCHMARK_REGISTER_F(Benchmark, STD_SINCOS);
+BENCHMARK_REGISTER_F(Benchmark, CC_SINCOS);
+BENCHMARK_REGISTER_F(Benchmark, STD_ATAN2);
+BENCHMARK_REGISTER_F(Benchmark, CC_ATAN2);
 
 BENCHMARK_MAIN();
