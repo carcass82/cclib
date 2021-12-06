@@ -1,14 +1,23 @@
 cmake_minimum_required(VERSION 3.8)
 
-project(CCBenchmark LANGUAGES CXX)
+project(CCLib LANGUAGES CXX)
 
-#set(CMAKE_VERBOSE_MAKEFILE ON)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin/")
+
+find_package(benchmark REQUIRED)
+find_package(GTest REQUIRED)
+
+find_package(glm REQUIRED)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-file(GLOB SRC_MAIN "./benchmark/benchmark.cpp")
+include_directories(.)
+
+set(BENCHMARK_SRC "./benchmark/benchmark.cpp")
+
+set(TEST_SRC "./test/test.cpp")
 
 #
 # Compiler options
@@ -35,4 +44,8 @@ message(STATUS "Release CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_RE
 message(STATUS "Debug CMAKE_EXE_LINKER_FLAGS: ${CMAKE_EXE_LINKER_FLAGS} ${CMAKE_EXE_LINKER_FLAGS_DEBUG}")
 message(STATUS "Release CMAKE_EXE_LINKER_FLAGS: ${CMAKE_EXE_LINKER_FLAGS} ${CMAKE_EXE_LINKER_FLAGS_RELEASE}")
 
-add_executable(${PROJECT_NAME} ${SRC_MAIN})
+add_executable(${PROJECT_NAME}_Benchmark ${BENCHMARK_SRC})
+target_link_libraries(${PROJECT_NAME}_Benchmark benchmark::benchmark)
+
+add_executable(${PROJECT_NAME}_Test ${TEST_SRC})
+target_link_libraries(${PROJECT_NAME}_Test GTest::GTest)

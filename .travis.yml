@@ -1,25 +1,12 @@
+dist: bionic
 language: cpp
 
-matrix:
-  include:
-    - os: linux
-      compiler: gcc
-    - os: windows
-
-addons:
-  apt:
-    sources:
-      - ubuntu-toolchain-r-test
-    packages:
-      - g++-8
-      - cmake
+before_install:
+  - sudo apt-get update
+  - sudo apt-get -y install cmake libglm-dev libgtest-dev libbenchmark-dev
 
 script:
-  - if [[ "$TRAVIS_OS_NAME" != "windows" ]]; then export CXX=g++-8 ; fi
-  - if [[ "$TRAVIS_OS_NAME" != "windows" ]]; then cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release . ; fi
-  - if [[ "$TRAVIS_OS_NAME" != "windows" ]]; then cmake --build . ; fi
-  - if [[ "$TRAVIS_OS_NAME" != "windows" ]]; then ./CCBenchmark ; fi
-  
-  - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then cmake -G "Visual Studio 15 2017 Win64" -DCMAKE_BUILD_TYPE=Release . ; fi
-  - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then cmake --build . -- -property:Configuration=Release ; fi
-  - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then ./Release/CCBenchmark.exe ; fi
+  - cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release .
+  - cmake --build .
+  - ./bin/CCLib_Benchmark
+  - ./bin/CCLib_Test
