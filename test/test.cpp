@@ -6,7 +6,7 @@
 #include <vector>
 
 #include "cclib.h"
-#include "cccontainer.h"
+#include "ccvector.h"
 
 // adjust tolerance for test results
 static constexpr float EPS = 1.e-4f;

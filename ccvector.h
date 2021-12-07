@@ -1,5 +1,5 @@
 /*
- * CCContainer
+ * CCLib
  *
  * collection of utils i use in most projects.
  * maybe it will evolve in a framework, maybe not
