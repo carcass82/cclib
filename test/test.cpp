@@ -3,7 +3,10 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include <vector>
+
 #include "cclib.h"
+#include "cccontainer.h"
 
 // adjust tolerance for test results
 static constexpr float EPS = 1.e-4f;
@@ -96,6 +99,48 @@ TEST_F(Test, Test4x4MatrixInverse)
             EXPECT_NEAR(m_glm[i][j], m_cc[i][j], EPS);
 }
 
+TEST_F(Test, Vector)
+{
+    cc::Vector<int> cc_test{ 1, 2, 3, 4, 5 };
+    std::vector<int> std_test{ 1, 2, 3, 4, 5 };
+    EXPECT_EQ(cc_test.size(), std_test.size());
+    EXPECT_EQ(cc_test.front(), std_test.front());
+    EXPECT_EQ(cc_test.back(), std_test.back());
+    for (int i = 0; i < 5; ++i)
+    {
+        EXPECT_EQ(cc_test[i], std_test[i]);
+    }
+
+    cc_test.emplace_back(6);
+    std_test.emplace_back(6);
+    EXPECT_EQ(cc_test.size(), std_test.size());
+    EXPECT_EQ(cc_test.front(), std_test.front());
+    EXPECT_EQ(cc_test.back(), std_test.back());
+
+    cc_test.resize(10, 7);
+    std_test.resize(10, 7);
+    EXPECT_EQ(cc_test.size(), std_test.size());
+    EXPECT_EQ(cc_test.front(), std_test.front());
+    EXPECT_EQ(cc_test.back(), std_test.back());
+
+    cc_test.resize(3);
+    std_test.resize(3);
+    EXPECT_EQ(cc_test.size(), std_test.size());
+    EXPECT_EQ(cc_test.front(), std_test.front());
+    EXPECT_EQ(cc_test.back(), std_test.back());
+
+    cc::Vector<int> cc_test_swap{ 50, 49, 48, 47, 46 };
+    std::vector<int> std_test_swap{ 50, 49, 48, 47, 46 };
+    cc_test.swap(cc_test_swap);
+    std_test.swap(std_test_swap);
+    EXPECT_EQ(cc_test.size(), std_test.size());
+    EXPECT_EQ(cc_test.front(), std_test.front());
+    EXPECT_EQ(cc_test.back(), std_test.back());
+    for (int i = 0; i < 5; ++i)
+    {
+        EXPECT_EQ(cc_test[i], std_test[i]);
+    }
+}
 
 int main(int argc, char** argv)
 {
