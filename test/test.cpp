@@ -140,6 +140,38 @@ TEST_F(Test, Vector)
     {
         EXPECT_EQ(cc_test[i], std_test[i]);
     }
+
+    // simple code from https://www.cplusplus.com/reference/vector/vector/operator[]
+    {
+        cc::Vector<int> stdvector(10);
+        cc::Vector<int>::size_type std_sz = stdvector.size();
+
+        std::vector<int> ccvector(10);
+        std::vector<int>::size_type cc_sz = ccvector.size();
+
+        EXPECT_EQ(std_sz, cc_sz);
+
+        for (unsigned i = 0; i < std_sz; i++) stdvector[i] = i;
+        for (unsigned i = 0; i < std_sz / 2; i++)
+        {
+            int temp;
+            temp = stdvector[std_sz - 1 - i];
+            stdvector[std_sz - 1 - i] = stdvector[i];
+            stdvector[i] = temp;
+        }
+
+        for (unsigned i = 0; i < cc_sz; i++) ccvector[i] = i;
+        for (unsigned i = 0; i < cc_sz / 2; i++)
+        {
+            int temp;
+            temp = ccvector[cc_sz - 1 - i];
+            ccvector[cc_sz - 1 - i] = ccvector[i];
+            ccvector[i] = temp;
+        }
+
+        for (unsigned i = 0; i < std_sz; i++)
+            EXPECT_EQ(stdvector[i], ccvector[i]);
+    }
 }
 
 int main(int argc, char** argv)
