@@ -27,6 +27,12 @@ build_script:
     
     cmake --build . --config Release
 
+    cd ../bin/Release
+
+    .\CCLib_Benchmark.exe
+
+    .\CCLib_Test.exe
+
 
 - sh: >-
     mkdir build && cd build
@@ -35,18 +41,9 @@ build_script:
     
     cmake --build . --config Release
 
-
-test_script:
-
-- cmd: >-
-    cd ../bin
-
-    .\CCLib_Benchmark.exe
-
-    .\CCLib_Test.exe
-
-
-- sh: >-
     . ../bin/CCLib_Benchmark
 
     . ../bin/CCLib_Test
+
+
+test: off
