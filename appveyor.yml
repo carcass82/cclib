@@ -1,0 +1,46 @@
+version: 1.0.{build}
+
+image:
+- Visual Studio 2019
+- Ubuntu
+
+install:
+- cmd: >-
+    vcpkg install glm:x64-windows benchmark:x64-windows gtest:x64-windows
+    cd c:\tools\vcpkg
+    vcpkg integrate install
+
+- sh: >-
+    sudo apt-get -y install libglm-dev libgtest-dev libbenchmark-dev
+
+
+cache: c:\tools\vcpkg\installed\
+
+
+build_script:
+
+- cmd: >-
+    mkdir build && cd build
+
+    cmake -G "Visual Studio 16 2019" -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=c:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake ..
+    
+    cmake --build . --config Release
+
+
+- sh: >-
+    mkdir build && cd build
+
+    cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release ..
+    
+    cmake --build . --config Release
+
+
+test_script:
+
+- cmd: >-
+    ./bin/CCLib_Benchmark.exe
+    ./bin/CCLib_Test.exe
+
+- sh: >-
+    ./bin/CCLib_Benchmark
+    ./bin/CCLib_Test
