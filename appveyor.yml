@@ -2,7 +2,7 @@ version: 1.0.{build}
 
 image:
 - Visual Studio 2019
-- Ubuntu
+- Ubuntu2004
 
 install:
 - cmd: >-
@@ -39,11 +39,14 @@ build_script:
 test_script:
 
 - cmd: >-
-    ../bin/CCLib_Benchmark.exe
+    cd ../bin
 
-    ../bin/CCLib_Test.exe
+    .\CCLib_Benchmark.exe
+
+    .\CCLib_Test.exe
+
 
 - sh: >-
     . ../bin/CCLib_Benchmark
-    
+
     . ../bin/CCLib_Test
