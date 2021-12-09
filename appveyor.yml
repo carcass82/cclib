@@ -8,8 +8,6 @@ install:
 - cmd: >-
     vcpkg install glm:x64-windows benchmark:x64-windows gtest:x64-windows
 
-    cd c:\tools\vcpkg
-    
     vcpkg integrate install
 
 
@@ -42,8 +40,10 @@ test_script:
 
 - cmd: >-
     ../bin/CCLib_Benchmark.exe
+
     ../bin/CCLib_Test.exe
 
 - sh: >-
     . ../bin/CCLib_Benchmark
+    
     . ../bin/CCLib_Test
